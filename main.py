@@ -362,15 +362,15 @@ class Niveau():
                         self.liste_de_projectile_a_l_ecran.remove(k)
 
     def creer_creeps(self):
-        # if self.ratio_creep_vert > 0:
-        #     for i in range(int(self.ratio_creep * self.ratio_creep_vert)):
-        #         self.liste_creep_attente.append(Creep_vert())
-        #
-        # for i in range(int(self.ratio_creep * self.ratio_creep_jaune)):
-        #     self.liste_creep_attente.append(Creep_jaune())
-        #
-        # for i in range(int(self.ratio_creep * self.ratio_creep_rouge)):
-        #     self.liste_creep_attente.append(Creep_rouge())
+        if self.ratio_creep_vert > 0:
+            for i in range(int(self.ratio_creep * self.ratio_creep_vert)):
+                self.liste_creep_attente.append(Creep_vert())
+
+        for i in range(int(self.ratio_creep * self.ratio_creep_jaune)):
+            self.liste_creep_attente.append(Creep_jaune())
+
+        for i in range(int(self.ratio_creep * self.ratio_creep_rouge)):
+            self.liste_creep_attente.append(Creep_rouge())
 
         self.liste_creep_attente.append(Boss())
 
@@ -396,8 +396,8 @@ class Creep():
         self.y1 = 275
         self.rayon = 15
         self.valeur_monetaire_creep = 0
-        self.valeur_vitesse_creep_x = 0
-        self.valeur_vitesse_creep_y = 0
+        self.vitesse_creep_X = 5
+        self.vitesse_creep_Y = 5
         self.troncon = 0
         self.debut = 0
         self.i_pyth = 0
