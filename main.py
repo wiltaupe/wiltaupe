@@ -396,8 +396,8 @@ class Creep():
         self.y1 = 275
         self.rayon = 15
         self.valeur_monetaire_creep = 0
-        self.vitesse_creep_X = 1
-        self.vitesse_creep_Y = 1
+        self.valeur_vitesse_creep_x = 0
+        self.valeur_vitesse_creep_y = 0
         self.troncon = 0
         self.debut = 0
         self.i_pyth = 0
@@ -419,6 +419,8 @@ class Creep():
             if self.debut == 0:
                 self.x1 = i[0][0][0]
                 self.y1 = i[0][0][1]
+                self.valeur_vitesse_creep_x = i[0][0][0]
+                self.valeur_vitesse_creep_y = i[0][0][1]
                 self.debut = 1
 
             distance = Helper.calcDistance(i[self.i_pyth][0][0],i[self.i_pyth][0][1],i[self.i_pyth][1][0],i[self.i_pyth][1][1])
@@ -433,44 +435,19 @@ class Creep():
                 if self.x1 > prochainpoint[0]:
                     self.x1 -= self.vitesse_creep_X
 
+
             if i[self.i_pyth][0][1] < i[self.i_pyth][1][1]:
-                if self.y1 < prochainpoint[0]:
+                if self.y1 < prochainpoint[1]:
                     self.y1 += self.vitesse_creep_Y
 
             if i[self.i_pyth][0][1] > i[self.i_pyth][1][1]:
-                if self.y1 > prochainpoint[0]:
+                if self.y1 > prochainpoint[1]:
                     self.y1 -= self.vitesse_creep_Y
-
-            print(self.x1)
-            print(prochainpoint[0],'\n')
-            print(self.y1)
-            print(prochainpoint[1],'\n')
-
 
             if self.x1 == prochainpoint[0] and self.y1 == prochainpoint[1]:
                 self.i_pyth += 1
                 self.x1 = prochainpoint[0]
                 self.y1 = prochainpoint[1]
-
-        # self.sentier = [[
-        #     [[0, 275], [240, 275]],
-        #     [[240, 275], [240, 50]],
-        #     [[240, 50], [840, 50]],
-        #     [[840, 50], [840, 515]],
-        #     [[840, 515], [1200, 515]]
-        # ]]
-
-
-        # if self.x1 < self.max1:
-        #     self.x1 += self.vitesse_creep_X
-        # elif self.x1 >= self.max1 and self.y1 >= self.max2 and self.x1 < 400:
-        #     self.y1 -= self.vitesse_creep_Y
-        # elif self.y1 <= self.max2 and self.x1 <= self.max3:
-        #     self.x1 += self.vitesse_creep_X
-        # elif self.x1 >= self.max3 and self.y1 <= self.max4 and self.x1 > 400:
-        #     self.y1 += self.vitesse_creep_Y
-        # elif self.y1 <= self.max3 and self.x1 <= self.max5 and self.x1 > 400:
-        #     self.x1 += self.vitesse_creep_X
 
 
 class Creep_vert(Creep):
