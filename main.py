@@ -204,7 +204,7 @@ class Modele():
             [[240, 275], [240, 50]],
             [[240, 50], [840, 50]],
             [[840, 50], [840, 515]],
-            [[840, 515], [1200, 515]]
+            [[840, 515], [1400, 515]]
         ]]
 
 
@@ -445,6 +445,8 @@ class Creep():
                     self.y1 -= self.vitesse_creep_Y
 
             if self.x1 == prochainpoint[0] and self.y1 == prochainpoint[1]:
+                # if self.i_pyth > len(i):
+                #     self.i_pyth = len(i)
                 self.i_pyth += 1
                 self.x1 = prochainpoint[0]
                 self.y1 = prochainpoint[1]
@@ -615,9 +617,11 @@ class Controleur():
         self.modele.partie.niveau.mettre_creeps_en_jeu()
 
     def debuter_partie(self, evt):
-        self.partie_en_cours = 1
-        self.modele.creer_partie()
-        self.jouer_partie()
+        if not self.partie_en_cours:
+
+            self.partie_en_cours = 1
+            self.modele.creer_partie()
+            self.jouer_partie()
 
     def jouer_partie(self):
         if self.partie_en_cours:
