@@ -469,8 +469,8 @@ class Creep():
         self.y1 = -1500
         self.rayon = 15
         self.valeur_monetaire_creep = 0
-        self.vitesse_creep_X = 5
-        self.vitesse_creep_Y = 5
+        self.vitesse_creep_X = 12
+        self.vitesse_creep_Y = 12
         self.troncon = 0
         self.debut = 0
         self.i_pyth = 0
@@ -491,8 +491,6 @@ class Creep():
             if self.debut == 0:
                 self.x1 = i[0][0][0]
                 self.y1 = i[0][0][1]
-                self.valeur_vitesse_creep_x = i[0][0][0]
-                self.valeur_vitesse_creep_y = i[0][0][1]
                 self.debut = 1
 
             distance = Helper.calcDistance(i[self.i_pyth][0][0], i[self.i_pyth][0][1], i[self.i_pyth][1][0],
@@ -503,19 +501,31 @@ class Creep():
 
             if i[self.i_pyth][0][0] < i[self.i_pyth][1][0]:
                 if self.x1 < prochainpoint[0]:
-                    self.x1 += self.vitesse_creep_X
+                    for j in range(self.vitesse_creep_X):
+                        self.x1 += 1
+                        if self.x1 > prochainpoint[0]:
+                            self.x1 = prochainpoint[0]
 
             if i[self.i_pyth][0][0] > i[self.i_pyth][1][0]:
                 if self.x1 > prochainpoint[0]:
-                    self.x1 -= self.vitesse_creep_X
+                    for j in range(self.vitesse_creep_X):
+                        self.x1 -= 1
+                        if self.x1 < prochainpoint[0]:
+                            self.x1 = prochainpoint[0]
 
             if i[self.i_pyth][0][1] < i[self.i_pyth][1][1]:
                 if self.y1 < prochainpoint[1]:
-                    self.y1 += self.vitesse_creep_Y
+                    for j in range(self.vitesse_creep_Y):
+                        self.y1 += 1
+                        if self.y1 > prochainpoint[1]:
+                            self.y1 = prochainpoint[1]
 
             if i[self.i_pyth][0][1] > i[self.i_pyth][1][1]:
                 if self.y1 > prochainpoint[1]:
-                    self.y1 -= self.vitesse_creep_Y
+                    for j in range(self.vitesse_creep_Y):
+                        self.y1 -= 1
+                        if self.y1 < prochainpoint[1]:
+                            self.y1 = prochainpoint[1]
 
             if self.x1 == prochainpoint[0] and self.y1 == prochainpoint[1]:
                 if self.i_pyth <= len(i)-1:
