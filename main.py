@@ -9,7 +9,6 @@ from PIL import ImageTk, Image
 
 class Vue():
     def __init__(self, parent):
-        #commentaire test
         self.parent = parent
         self.modele = self.parent.modele
         self.root = Tk()
@@ -133,7 +132,7 @@ class Vue():
         btn_debuter_partie = Button(frame_bouttons_row2, text="DÉBUTER PARTIE",bg="#000", fg="#fff", font="courier 16 bold" )
         btn_nouvelle_vague = Button(frame_bouttons_row2, text="NOUVELLE VAGUE",bg="#000", fg="#fff", font="courier 16 bold" )
         btn_creeps_ecran = Button(frame_bouttons_row2, text="NB CREEPS À L'ÉCRAN",bg="#000", fg="#fff", font="courier 16 bold" )
-        btn_upgrade_tour = Button(frame_bouttons_row3, text="AMÉLIORER TOUR", bg="#000", fg="#fff", font="courier 16 bold",)
+        btn_upgrade_tour = Button(frame_bouttons_row3, text="AMÉLIORER DÉGATS DES TOURS (300 SAGESSE)", bg="#000", fg="#fff", font="courier 16 bold",)
 
         # label_map = Label(frame_infos_partie, text="INFO PARTIE: \n"
         #                                            "Niveau: \n"
@@ -174,6 +173,7 @@ class Vue():
         btn_tour_mauve.bind("<Button-1>", self.parent.choisir_couleur_mauve)
         btn_tour_blanche.bind("<Button-1>", self.parent.choisir_couleur_blanche)
         btn_creeps_ecran.bind("<Button-1>", self.modele.nb_creeps)
+        btn_upgrade_tour.bind("<Button-1>", self.parent.upgrade_tours)
 
         # visualiser
         self.frame_stats.pack(fill=X)
@@ -238,10 +238,11 @@ class Vue():
     def creer_tour(self, evt):
         couleur_tour = self.parent.modele.partie.couleur_choisie
         tour_creee = self.parent.creer_tour(evt, couleur_tour)
-        if couleur_tour != 0:
-            self.canevas.create_oval(evt.x - tour_creee.rayon, evt.y - tour_creee.rayon,
-                                     evt.x + tour_creee.rayon, evt.y + tour_creee.rayon,
-                                     fill=None, tags=("statique"))
+        if tour_creee is not None:
+            if couleur_tour != 0:
+                self.canevas.create_oval(evt.x - tour_creee.rayon, evt.y - tour_creee.rayon,
+                                         evt.x + tour_creee.rayon, evt.y + tour_creee.rayon,
+                                         fill=None, tags=("statique"))
         #TOUR BLEUE = VERT
         #TOUR MAUVE = ROUGE
         #TOUR BLANCHE = BLANCHE
@@ -249,13 +250,14 @@ class Vue():
         if couleur_tour == 1:
             couleur_tour = "#10B531" #GREEN
         if couleur_tour == 2:
-            couleur_tour = "red"
+            couleur_tour = "purple"
         if couleur_tour == 3:
             couleur_tour = "white"
-        if couleur_tour != 0:
-            self.canevas.create_rectangle(evt.x + tour_creee.demitaillex, evt.y + tour_creee.demitailley,
-                                          evt.x - tour_creee.demitaillex, evt.y - tour_creee.demitailley,
-                                          fill=couleur_tour, tags=("statique"))
+        if tour_creee is not None:
+            if couleur_tour != 0:
+                self.canevas.create_rectangle(evt.x + tour_creee.demitaillex, evt.y + tour_creee.demitailley,
+                                              evt.x - tour_creee.demitaillex, evt.y - tour_creee.demitailley,
+                                              fill=couleur_tour, tags=("statique"))
 
     def fin_partie(self):
         self.canevas.delete("statique")
@@ -296,6 +298,9 @@ class Modele():
     def jouer_tour(self):
         self.partie.jouer_tour()
 
+    def upgrade_tours(self, evt):
+        self.partie.upgrade_tours(evt)
+
 
 class Partie():
     def __init__(self, parent):
@@ -304,7 +309,7 @@ class Partie():
         self.total_points = 0
         self.total_vie = 100
         self.total_argent = 1000
-        self.total_sagesse = 0
+        self.total_sagesse = 600
         self.niveau_actuel = 1
         self.niveau = Niveau(self, self.niveau_actuel)
         self.creeps_tues = 0
@@ -312,15 +317,18 @@ class Partie():
         self.i = 1  # Utiliser pour l'augmentation de la sagesse de niveau
         self.liste_tours = []
         self.total_bombes = 0
+        self.cout_upgrade = 300
 
+    def upgrade_tours(self, evt):
+        if self.total_sagesse >= self.cout_upgrade:
+            self.total_sagesse -= self.cout_upgrade
+            self.niveau.upgrade_tours(evt)
 
     def creer_niveau(self, evt):
         self.niveau.liste_creep_a_l_ecran.clear()
         self.niveau_actuel += 1
         self.niveau.fin_niveau = False
         self.niveau.creer_creeps()
-        print("A L'ÉCRAN:", len(self.niveau.liste_creep_a_l_ecran))
-        print("EN ATTENTE:", len(self.niveau.liste_creep_attente))
 
     def augmenter_sagesse(self):
         augsag = 50 * self.i
@@ -343,26 +351,27 @@ class Partie():
         self.couleur_choisie = 3
 
     def creer_tour(self,evt, couleur_tour):
-        if couleur_tour == 1:
-            if self.total_argent >= self.niveau.tour_bleue_valeur:
-                self.total_argent -= self.niveau.tour_bleue_valeur
-                tour_creee = Tour_Bleu(self, evt.x, evt.y)
-                self.liste_tours.append(tour_creee)
-                return tour_creee
+        if self.total_argent > 100:
+            if couleur_tour == 1:
+                if self.total_argent >= self.niveau.tour_bleue_valeur:
+                    self.total_argent -= self.niveau.tour_bleue_valeur
+                    tour_creee = Tour_Bleu(self, evt.x, evt.y)
+                    self.liste_tours.append(tour_creee)
+                    return tour_creee
 
-        if couleur_tour == 2:
-            if self.total_argent >= self.niveau.tour_mauve_valeur:
-                self.total_argent -= self.niveau.tour_mauve_valeur
-                tour_creee = Tour_Mauve(self, evt.x, evt.y)
-                self.liste_tours.append(tour_creee)
-                return tour_creee
+            if couleur_tour == 2:
+                if self.total_argent >= self.niveau.tour_mauve_valeur:
+                    self.total_argent -= self.niveau.tour_mauve_valeur
+                    tour_creee = Tour_Mauve(self, evt.x, evt.y)
+                    self.liste_tours.append(tour_creee)
+                    return tour_creee
 
-        if couleur_tour == 3:
-            if self.total_argent >= self.niveau.tour_blanche_valeur:
-                self.total_argent -= self.niveau.tour_blanche_valeur
-                tour_creee = Tour_Blanche(self, evt.x, evt.y)
-                self.liste_tours.append(tour_creee)
-                return tour_creee
+            if couleur_tour == 3:
+                if self.total_argent >= self.niveau.tour_blanche_valeur:
+                    self.total_argent -= self.niveau.tour_blanche_valeur
+                    tour_creee = Tour_Blanche(self, evt.x, evt.y)
+                    self.liste_tours.append(tour_creee)
+                    return tour_creee
 
 
 class Niveau():
@@ -388,6 +397,16 @@ class Niveau():
         self.tour_blanche_valeur = 1000
         self.fin_niveau = False
         self.creer_creeps()
+
+    def upgrade_tours(self, evt):
+        for i in self.liste_de_projectile_a_l_ecran:
+            i.degats *= 2
+            if isinstance(i, Projectil_a):
+                print(i.degats)
+            if isinstance(i, Projectil_b):
+                print(i.degats)
+            if isinstance(i, Projectil_c):
+                print(i.degats)
 
     def jouer_tour(self):
 
@@ -601,7 +620,7 @@ class Tour():
         self.position_x_tour = x
         self.position_y_tour = y
         self.demitaillex = 25
-        self.demitailley = 50
+        self.demitailley = 25
         self.valeur_monnetaire_tour = 0
         self.rayon = 0
         self.valeur_vente = 0
@@ -854,6 +873,9 @@ class Controleur():
 
     def creer_niveau(self, evt):
         self.modele.partie.creer_niveau(evt)
+
+    def upgrade_tours(self, evt):
+        self.modele.upgrade_tours(evt)
 
 
 if __name__ == '__main__':
