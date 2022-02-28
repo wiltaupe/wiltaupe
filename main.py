@@ -9,6 +9,7 @@ from PIL import ImageTk, Image
 
 class Vue():
     def __init__(self, parent):
+        #commentaire test
         self.parent = parent
         self.modele = self.parent.modele
         self.root = Tk()
