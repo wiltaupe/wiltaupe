@@ -80,11 +80,13 @@ class Vue():
         frame_infos_partie1 = Frame(frame_infos_partie,borderwidth=3, relief="sunken", bg="#000000")
         frame_infos_partie2 = Frame(frame_infos_partie,borderwidth=3, relief="sunken", bg="#000000")
         frame_infos_partie3 = Frame(frame_infos_partie,borderwidth=3, relief="sunken", bg="#000000")
+
         # frame_infos_tour = Frame(self.frame_bas, borderwidth=3, relief="sunken", bg="#000000")
         frame_bouttons = Frame(self.frame_bas, borderwidth=3, relief="sunken", bg="#000000")
         frame_bouttons_row1 = Frame(frame_bouttons)
         frame_bouttons_row2 = Frame(frame_bouttons)
         frame_bouttons_row3 = Frame(frame_bouttons)
+        frame_bouttons_row4 = Frame(frame_bouttons)
 
         ##label debuter partie
 
@@ -133,18 +135,9 @@ class Vue():
         btn_nouvelle_vague = Button(frame_bouttons_row2, text="NOUVELLE VAGUE",bg="#000", fg="#fff", font="courier 16 bold" )
         btn_creeps_ecran = Button(frame_bouttons_row2, text="NB CREEPS À L'ÉCRAN",bg="#000", fg="#fff", font="courier 16 bold" )
         btn_upgrade_tour = Button(frame_bouttons_row3, text="AMÉLIORER DÉGATS DES TOURS (300 SAGESSE)", bg="#000", fg="#fff", font="courier 16 bold",)
-
-        # label_map = Label(frame_infos_partie, text="INFO PARTIE: \n"
-        #                                            "Niveau: \n"
-        #                                            "# Vague: \n"
-        #                                            "# Bombes: \n"
-        #                                            "Kill Count: \n",
-        #                   bg="#FFFBBD")
+        btn_pause = Button(frame_bouttons_row2, text="PAUSE", bg="#000", fg="#fff", font="courier 16 bold",)
 
         label_acheter_tours = Label(frame_bouttons, text="Acheter tours: ", bg="#000000", font="Courier 24 bold", fg="#FFF")
-
-
-
 
         # label_map.pack(side=LEFT, expand=1)
 
@@ -154,6 +147,7 @@ class Vue():
         btn_tour_blanche.pack(side=LEFT, fill=X, expand=1)
         btn_nouvelle_vague.pack(side=LEFT, fill=X, expand=1)
         btn_debuter_partie.pack(side=LEFT, fill=X, expand=1)
+        btn_pause.pack( side=LEFT, fill=X, expand=1)
 
 
         btn_creeps_ecran.pack(side=LEFT, fill=X, expand=1)
@@ -173,7 +167,8 @@ class Vue():
         btn_tour_mauve.bind("<Button-1>", self.parent.choisir_couleur_mauve)
         btn_tour_blanche.bind("<Button-1>", self.parent.choisir_couleur_blanche)
         btn_creeps_ecran.bind("<Button-1>", self.modele.nb_creeps)
-        btn_upgrade_tour.bind("<Button-1>", self.parent.upgrade_tours)
+        # btn_upgrade_tour.bind("<Button-1>", self.parent.upgrade_tours)
+        btn_pause.bind("<Button-1>", self.parent.pause)
 
         # visualiser
         self.frame_stats.pack(fill=X)
@@ -298,8 +293,8 @@ class Modele():
     def jouer_tour(self):
         self.partie.jouer_tour()
 
-    def upgrade_tours(self, evt):
-        self.partie.upgrade_tours(evt)
+    # def upgrade_tours(self, evt):
+    #     self.partie.upgrade_tours(evt)
 
 
 class Partie():
@@ -309,7 +304,7 @@ class Partie():
         self.total_points = 0
         self.total_vie = 100
         self.total_argent = 1000
-        self.total_sagesse = 600
+        self.total_sagesse = 6000
         self.niveau_actuel = 1
         self.niveau = Niveau(self, self.niveau_actuel)
         self.creeps_tues = 0
@@ -318,11 +313,16 @@ class Partie():
         self.liste_tours = []
         self.total_bombes = 0
         self.cout_upgrade = 300
+        # self.projectile = Projectile(0, 0, 0)
+        # self.projectile_a = Projectil_a(0, 0, 0)
+        self.ratio_upgrade = 1
 
-    def upgrade_tours(self, evt):
-        if self.total_sagesse >= self.cout_upgrade:
-            self.total_sagesse -= self.cout_upgrade
-            self.niveau.upgrade_tours(evt)
+    # def upgrade_tours(self, evt):
+    #     if self.total_sagesse >= self.cout_upgrade:
+    #         self.total_sagesse -= self.cout_upgrade
+    #         self.projectile_a.degats *= (2 * self.ratio_upgrade)
+    #         self.ratio_upgrade += 0.5
+    #         print(self.projectile_a.degats)
 
     def creer_niveau(self, evt):
         self.niveau.liste_creep_a_l_ecran.clear()
@@ -396,17 +396,14 @@ class Niveau():
         self.tour_mauve_valeur = 700
         self.tour_blanche_valeur = 1000
         self.fin_niveau = False
+        self.valeur_degat = 0.5
         self.creer_creeps()
 
-    def upgrade_tours(self, evt):
-        for i in self.liste_de_projectile_a_l_ecran:
-            i.degats *= 2
-            if isinstance(i, Projectil_a):
-                print(i.degats)
-            if isinstance(i, Projectil_b):
-                print(i.degats)
-            if isinstance(i, Projectil_c):
-                print(i.degats)
+    # def upgrade_tours(self, evt):
+    #     for i in self.liste_de_projectile_a_l_ecran:
+    #         i.degats *= (2 * self.valeur_degat)
+    #         self.valeur_degat += 0.5
+
 
     def jouer_tour(self):
 
@@ -683,8 +680,9 @@ class Tour_Blanche(Tour):
         self.cooldown_tower = 40
 
 
-class Projectile():
+class Projectile(Partie):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
+        self.parent = Partie
         self.position_projectile_x = position_projectile_x
         self.position_projectile_y = position_projectile_y
         self.degats = 0
@@ -695,6 +693,9 @@ class Projectile():
         self.couleur_projectile = ""
         self.unefois = 0
         self.out_of_bound = False
+
+    # def upgrade_tours(self, evt):
+    #     self.degats += 100
 
 class Projectil_a(Projectile):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
@@ -837,7 +838,16 @@ class Controleur():
         self.partie_en_cours = 0
         self.modele = Modele(self)
         self.vue = Vue(self)
+        self.pause_en_cours = 0
         self.vue.root.mainloop()
+
+    def pause(self, evt):
+        if not self.pause_en_cours:
+            self.pause_en_cours = 1
+            self.jouer_partie()
+        elif self.pause_en_cours:
+            self.pause_en_cours = 0
+            self.jouer_partie()
 
     def mettre_creeps_en_jeu(self):
         self.modele.partie.niveau.mettre_creeps_en_jeu()
@@ -850,9 +860,10 @@ class Controleur():
 
     def jouer_partie(self):
         if self.partie_en_cours:
-            self.modele.jouer_tour()
-            self.vue.afficher_partie()
-            self.vue.root.after(40, self.jouer_partie)
+            if not self.pause_en_cours:
+                self.modele.jouer_tour()
+                self.vue.afficher_partie()
+                self.vue.root.after(40, self.jouer_partie)
         else:
             self.vue.fin_partie()
 
@@ -874,8 +885,8 @@ class Controleur():
     def creer_niveau(self, evt):
         self.modele.partie.creer_niveau(evt)
 
-    def upgrade_tours(self, evt):
-        self.modele.upgrade_tours(evt)
+    # def upgrade_tours(self, evt):
+    #     self.modele.upgrade_tours(evt)
 
 
 if __name__ == '__main__':
