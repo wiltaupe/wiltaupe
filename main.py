@@ -456,7 +456,7 @@ class Niveau():
                             if k.creep_touche or k.out_of_bound:
                                     self.liste_de_projectile_a_l_ecran.remove(k)
                         if isinstance(k, Projectil_c):
-                            k.mine_tower(self.liste_creep_a_l_ecran,self.parent.parent.sentier)
+                            k.projectile_rebound(self.liste_creep_a_l_ecran)
                             if k.creep_touche:
                                     self.liste_de_projectile_a_l_ecran.remove(k)
 
@@ -693,6 +693,8 @@ class Projectile(Partie):
         self.couleur_projectile = ""
         self.unefois = 0
         self.out_of_bound = False
+        self.cible = 0
+        self.rebound = 0
 
     # def upgrade_tours(self, evt):
     #     self.degats += 100
@@ -778,6 +780,48 @@ class Projectil_b(Projectile):
                     i.creep_touche = False
 
 class Projectil_c(Projectile):
+    def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
+        Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
+        self.couleur_projectile = 3
+        self.degats = 30
+        self.vitesse_projectile = 20
+        self.rayon = 5
+        self.cible = 0
+        self.rebound = 3
+
+
+    def projectile_rebound(self,liste_de_creep):
+
+        distance_projectile = Helper.calcDistance(self.position_projectile_x, self.position_projectile_y,liste_de_creep[self.cible].x1, liste_de_creep[self.cible].y1)
+        angle_projectile = Helper.calcAngle(self.position_projectile_x, self.position_projectile_y, liste_de_creep[self.cible].x1,liste_de_creep[self.cible].y1)
+        cible_projectile = Helper.getAngledPoint(angle_projectile, self.vitesse_projectile, self.position_projectile_x,self.position_projectile_y)
+
+        self.position_projectile_x = cible_projectile[0]
+        self.position_projectile_y = cible_projectile[1]
+
+        if distance_projectile < liste_de_creep[self.cible].rayon:
+            liste_de_creep[self.cible].creep_touche = True
+
+        if liste_de_creep[self.cible].creep_touche:
+            if liste_de_creep[self.cible].vie_creep > 0:
+                liste_de_creep[self.cible].vie_creep -= self.degats
+                liste_de_creep[self.cible].creep_touche = False
+
+            if liste_de_creep[self.cible].vie_creep < 0:
+                self.rebound -= 1
+
+            if liste_de_creep[self.cible].vie_creep > 0:
+                self.cible += 1
+
+            if len(liste_de_creep) < 3:
+                self.cible = 0
+                self.rebound = 0
+
+            if self.cible == self.rebound:
+                self.creep_touche = True
+
+
+class Projectil_d(Projectile):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
         Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
         self.couleur_projectile = 3
