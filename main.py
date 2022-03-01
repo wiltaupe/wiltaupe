@@ -218,7 +218,7 @@ class Vue():
         self.canevas.tag_bind("background", "<Button-1>", self.creer_tour)
         self.canevas.tag_bind("tour", "<Button-3>", self.choisir_tour)
 
-        for i in self.modele.sentier[0]:
+        for i in self.modele.sentier[self.parent.modele.sentier_choisi]:
             self.canevas.create_line(i, width=40, fill="#AAAAAA", tags=("sentier"))
 
         for i in self.modele.partie.niveau.liste_creep_a_l_ecran:
@@ -270,6 +270,7 @@ class Vue():
     def fin_partie(self):
         self.canevas.delete("statique")
         self.canevas.delete("dynamique")
+        self.canevas.delete("tour")
         tkinter.messagebox.showinfo('Votre survie a échoué ',
                                     "Désirez-vous récupérer votre honneur?\n Appuyez débuter Partie",
                                     parent=self.parent.vue.root)
@@ -283,16 +284,31 @@ class Modele():
     def __init__(self, parent):
         self.parent = parent
         self.partie = None
-        self.sentier = [[
-            [[0, 275], [240, 275]],
-            [[240, 275], [240, 50]],
-            [[240, 50], [840, 50]],
-            [[840, 50], [840, 515]],
-            [[840, 515], [1400, 515]]
-        ]]
+        self.sentier_choisi = 0
+        self.sentier = [
+            #premier sentier
+            [
+                [[0, 275], [240, 275]],
+                [[240, 275], [240, 50]],
+                [[240, 50], [840, 50]],
+                [[840, 50], [840, 515]],
+                [[840, 515], [1400, 515]]
+            ],
+            #deuxieme sentier
+            [
+                [[1000, 0], [1000, 240]],
+                [[1000, 240], [100, 240]],
+                [[100, 240], [100, 120]],
+                [[100, 120], [800, 120]],
+                [[800, 120], [800, 550]],
+                [[800, 550], [1100, 550]],
+                [[1100, 550], [1100, 500]],
+                [[1100, 500], [100, 500]],
+                [[100, 500], [100, 400]],
+                [[100, 400], [1400, 400]]
+            ]
+        ]
 
-        self.chemins = [[0, 275, 315, 275, 315, 50, 840, 50, 840, 440, 1200, 440, 1200, 515,
-                         840, 515, 765, 515, 765, 440, 765, 125, 390, 125, 390, 350, 240, 350, 0, 350, ]]
 
         self.largeur = 1200
         self.hauteur = 600
@@ -517,54 +533,55 @@ class Creep():
         self.deplacement(parent)
 
     def deplacement(self, parent):
-        for i in parent.parent.parent.sentier:
 
-            if self.debut == 0:
-                self.x1 = i[0][0][0]
-                self.y1 = i[0][0][1]
-                self.debut = 1
 
-            #print(parent.parent.parent.sentier[0][self.i_pyth][0][0])
+        map = parent.parent.parent.sentier_choisi
+        sen = parent.parent.parent.sentier
 
-            distance = Helper.calcDistance(i[self.i_pyth][0][0], i[self.i_pyth][0][1], i[self.i_pyth][1][0],
-                                           i[self.i_pyth][1][1])
-            angle = Helper.calcAngle(i[self.i_pyth][0][0], i[self.i_pyth][0][1], i[self.i_pyth][1][0],
-                                     i[self.i_pyth][1][1])
-            prochainpoint = Helper.getAngledPoint(angle, distance, i[self.i_pyth][0][0], i[self.i_pyth][0][1])
+        if self.debut == 0:
+            self.x1 = sen[map][0][0][0]
+            self.y1 = sen[map][0][0][1]
+            self.debut = 1
 
-            if i[self.i_pyth][0][0] < i[self.i_pyth][1][0]:
-                if self.x1 < prochainpoint[0]:
-                    for j in range(self.vitesse_creep_X):
-                        self.x1 += 1
-                        if self.x1 > prochainpoint[0]:
-                            self.x1 = prochainpoint[0]
 
-            if i[self.i_pyth][0][0] > i[self.i_pyth][1][0]:
-                if self.x1 > prochainpoint[0]:
-                    for j in range(self.vitesse_creep_X):
-                        self.x1 -= 1
-                        if self.x1 < prochainpoint[0]:
-                            self.x1 = prochainpoint[0]
 
-            if i[self.i_pyth][0][1] < i[self.i_pyth][1][1]:
-                if self.y1 < prochainpoint[1]:
-                    for j in range(self.vitesse_creep_Y):
-                        self.y1 += 1
-                        if self.y1 > prochainpoint[1]:
-                            self.y1 = prochainpoint[1]
+        distance = Helper.calcDistance(sen[map][self.i_pyth][0][0], sen[map][self.i_pyth][0][1], sen[map][self.i_pyth][1][0],sen[map][self.i_pyth][1][1])
+        angle = Helper.calcAngle(sen[map][self.i_pyth][0][0], sen[map][self.i_pyth][0][1], sen[map][self.i_pyth][1][0],sen[map][self.i_pyth][1][1])
+        prochainpoint = Helper.getAngledPoint(angle, distance, sen[map][self.i_pyth][0][0], sen[map][self.i_pyth][0][1])
 
-            if i[self.i_pyth][0][1] > i[self.i_pyth][1][1]:
-                if self.y1 > prochainpoint[1]:
-                    for j in range(self.vitesse_creep_Y):
-                        self.y1 -= 1
-                        if self.y1 < prochainpoint[1]:
-                            self.y1 = prochainpoint[1]
+        if sen[map][self.i_pyth][0][0] < sen[map][self.i_pyth][1][0]:
+            if self.x1 < prochainpoint[0]:
+                for j in range(self.vitesse_creep_X):
+                    self.x1 += 1
+                    if self.x1 > prochainpoint[0]:
+                        self.x1 = prochainpoint[0]
 
-            if self.x1 == prochainpoint[0] and self.y1 == prochainpoint[1]:
-                if self.i_pyth <= len(i) - 1:
-                    self.i_pyth += 1
-                    self.x1 = prochainpoint[0]
-                    self.y1 = prochainpoint[1]
+        if sen[map][self.i_pyth][0][0] > sen[map][self.i_pyth][1][0]:
+            if self.x1 > prochainpoint[0]:
+                for j in range(self.vitesse_creep_X):
+                    self.x1 -= 1
+                    if self.x1 < prochainpoint[0]:
+                        self.x1 = prochainpoint[0]
+
+        if sen[map][self.i_pyth][0][1] < sen[map][self.i_pyth][1][1]:
+            if self.y1 < prochainpoint[1]:
+                for j in range(self.vitesse_creep_Y):
+                    self.y1 += 1
+                    if self.y1 > prochainpoint[1]:
+                        self.y1 = prochainpoint[1]
+
+        if sen[map][self.i_pyth][0][1] > sen[map][self.i_pyth][1][1]:
+            if self.y1 > prochainpoint[1]:
+                for j in range(self.vitesse_creep_Y):
+                    self.y1 -= 1
+                    if self.y1 < prochainpoint[1]:
+                        self.y1 = prochainpoint[1]
+
+        if self.x1 == prochainpoint[0] and self.y1 == prochainpoint[1]:
+            if self.i_pyth <= len(sen[map]) - 1:
+                self.i_pyth += 1
+                self.x1 = prochainpoint[0]
+                self.y1 = prochainpoint[1]
 
 
 class Creep_vert(Creep):
