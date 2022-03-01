@@ -8,10 +8,12 @@ from PIL import ImageTk, Image
 
 id = 0
 
+
 def creer_id():
     global id
     id += 1
     return id
+
 
 class Vue():
     def __init__(self, parent):
@@ -56,15 +58,15 @@ class Vue():
         label_score = Label(frame_stats2, text="Score:", bg="#000000", borderwidth=3,
                             relief="sunken", fg="#FFF", font="Courier 16 bold")
         label_score_text = Label(frame_stats2, text="Vie:", textvariable=self.score, bg="#000000",
-                                 borderwidth=3, relief="sunken",font="Courier 24 bold", fg="#FFF" )
+                                 borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
         label_sagesse = Label(frame_stats3, text="Sagesse:", bg="#000000", borderwidth=3,
                               relief="sunken", fg="#FFF", font="Courier 16 bold")
         label_sagesse_text = Label(frame_stats3, text="Vie:", textvariable=self.sagesse,
-                                   bg="#000000", borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF" )
+                                   bg="#000000", borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
         label_argent = Label(frame_stats4, text="Argent:", bg="#000000", borderwidth=3,
                              relief="sunken", fg="#FFF", font="Courier 16 bold")
         label_argent_text = Label(frame_stats4, text="Vie:", textvariable=self.argent, bg="#000000",
-                                  borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF" )
+                                  borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
 
         label_vie_text.pack(expand=1)
         label_vie.pack(expand=1)
@@ -83,9 +85,9 @@ class Vue():
 
         # INFOS PARTIE, INFO TOUR, BOUTONS
         frame_infos_partie = Frame(self.frame_bas, borderwidth=3, relief="sunken", bg="#000000")
-        frame_infos_partie1 = Frame(frame_infos_partie,borderwidth=3, relief="sunken", bg="#000000")
-        frame_infos_partie2 = Frame(frame_infos_partie,borderwidth=3, relief="sunken", bg="#000000")
-        frame_infos_partie3 = Frame(frame_infos_partie,borderwidth=3, relief="sunken", bg="#000000")
+        frame_infos_partie1 = Frame(frame_infos_partie, borderwidth=3, relief="sunken", bg="#000000")
+        frame_infos_partie2 = Frame(frame_infos_partie, borderwidth=3, relief="sunken", bg="#000000")
+        frame_infos_partie3 = Frame(frame_infos_partie, borderwidth=3, relief="sunken", bg="#000000")
 
         # frame_infos_tour = Frame(self.frame_bas, borderwidth=3, relief="sunken", bg="#000000")
         frame_bouttons = Frame(self.frame_bas, borderwidth=3, relief="sunken", bg="#000000")
@@ -103,47 +105,53 @@ class Vue():
         self.nbcreepstues = StringVar()
         self.nbcreepstues.set("0")
         label_niveau = Label(frame_infos_partie1, text="Niveau:", bg="#000000", borderwidth=3,
-                               relief="sunken", font="Courier 16 bold", fg="#FFF")
-        label_niveau_texte = Label(frame_infos_partie1, textvariable = self.niveau, bg="#000000", borderwidth=3,
-                               relief="sunken", font="Courier 16 bold", fg="#FFF")
+                             relief="sunken", font="Courier 16 bold", fg="#FFF")
+        label_niveau_texte = Label(frame_infos_partie1, textvariable=self.niveau, bg="#000000", borderwidth=3,
+                                   relief="sunken", font="Courier 16 bold", fg="#FFF")
         label_bombes = Label(frame_infos_partie2, text="Bombes:", bg="#000000", borderwidth=3,
-                               relief="sunken", font="Courier 16 bold", fg="#FFF")
-        label_bombes_texte = Label(frame_infos_partie2, textvariable = self.bombes, bg="#000000", borderwidth=3,
+                             relief="sunken", font="Courier 16 bold", fg="#FFF")
+        label_bombes_texte = Label(frame_infos_partie2, textvariable=self.bombes, bg="#000000", borderwidth=3,
                                    relief="sunken", font="Courier 16 bold", fg="#FFF")
         label_creeps_tues = Label(frame_infos_partie3, text="Creeps tués:", bg="#000000", borderwidth=3,
-                             relief="sunken", font="Courier 16 bold", fg="#FFF")
-        label_creeps_tues_texte = Label(frame_infos_partie3, textvariable = self.nbcreepstues, bg="#000000", borderwidth=3,
-                                   relief="sunken", font="Courier 16 bold", fg="#FFF")
+                                  relief="sunken", font="Courier 16 bold", fg="#FFF")
+        label_creeps_tues_texte = Label(frame_infos_partie3, textvariable=self.nbcreepstues, bg="#000000",
+                                        borderwidth=3,
+                                        relief="sunken", font="Courier 16 bold", fg="#FFF")
 
         label_niveau.pack(expand=1)
         label_niveau_texte.pack(expand=1, fill=X)
         frame_infos_partie1.pack(expand=1)
         label_bombes.pack(expand=1)
-        label_bombes_texte.pack(expand=1,fill=X)
+        label_bombes_texte.pack(expand=1, fill=X)
         frame_infos_partie2.pack(expand=1)
         label_creeps_tues.pack(expand=1)
         label_creeps_tues_texte.pack(expand=1, fill=X)
 
         frame_infos_partie3.pack()
 
-
-
-
         frame_infos_partie.pack(expand=1, fill=BOTH, side=LEFT)
         # frame_infos_tour.pack(expand=1, fill=BOTH, side=LEFT)
         frame_bouttons.pack(expand=1, fill=BOTH, side=LEFT)
 
-        btn_tour_bleue = Button(frame_bouttons_row1, text="TOUR VERTE (500$)", bg="#000", fg="#fff", font="courier 16 bold" )
-        btn_tour_mauve = Button(frame_bouttons_row1, text="TOUR ROUGE (700$)", bg="#000", fg="#fff", font="courier 16 bold" )
-        btn_tour_blanche = Button(frame_bouttons_row1, text="TOUR BLANCHE (1000$)", bg="#000", fg="#fff", font="courier 16 bold")
+        btn_tour_bleue = Button(frame_bouttons_row1, text="TOUR VERTE (500$)", bg="#000", fg="#fff",
+                                font="courier 16 bold")
+        btn_tour_mauve = Button(frame_bouttons_row1, text="TOUR ROUGE (700$)", bg="#000", fg="#fff",
+                                font="courier 16 bold")
+        btn_tour_blanche = Button(frame_bouttons_row1, text="TOUR BLANCHE (1000$)", bg="#000", fg="#fff",
+                                  font="courier 16 bold")
 
-        btn_debuter_partie = Button(frame_bouttons_row2, text="DÉBUTER PARTIE",bg="#000", fg="#fff", font="courier 16 bold" )
-        btn_nouvelle_vague = Button(frame_bouttons_row2, text="NOUVELLE VAGUE",bg="#000", fg="#fff", font="courier 16 bold" )
-        btn_creeps_ecran = Button(frame_bouttons_row2, text="NB CREEPS À L'ÉCRAN",bg="#000", fg="#fff", font="courier 16 bold" )
-        btn_upgrade_tour = Button(frame_bouttons_row3, text="AMÉLIORER DÉGATS DES TOURS (300 SAGESSE)", bg="#000", fg="#fff", font="courier 16 bold",)
-        btn_pause = Button(frame_bouttons_row2, text="PAUSE", bg="#000", fg="#fff", font="courier 16 bold",)
+        btn_debuter_partie = Button(frame_bouttons_row2, text="DÉBUTER PARTIE", bg="#000", fg="#fff",
+                                    font="courier 16 bold")
+        btn_nouvelle_vague = Button(frame_bouttons_row2, text="NOUVELLE VAGUE", bg="#000", fg="#fff",
+                                    font="courier 16 bold")
+        btn_creeps_ecran = Button(frame_bouttons_row2, text="NB CREEPS À L'ÉCRAN", bg="#000", fg="#fff",
+                                  font="courier 16 bold")
+        btn_upgrade_tour = Button(frame_bouttons_row3, text="AMÉLIORER DÉGATS DES TOURS (300 SAGESSE)", bg="#000",
+                                  fg="#fff", font="courier 16 bold", )
+        btn_pause = Button(frame_bouttons_row2, text="PAUSE", bg="#000", fg="#fff", font="courier 16 bold", )
 
-        label_acheter_tours = Label(frame_bouttons, text="Acheter tours: ", bg="#000000", font="Courier 24 bold", fg="#FFF")
+        label_acheter_tours = Label(frame_bouttons, text="Acheter tours: ", bg="#000000", font="Courier 24 bold",
+                                    fg="#FFF")
 
         # label_map.pack(side=LEFT, expand=1)
 
@@ -153,8 +161,7 @@ class Vue():
         btn_tour_blanche.pack(side=LEFT, fill=X, expand=1)
         btn_nouvelle_vague.pack(side=LEFT, fill=X, expand=1)
         btn_debuter_partie.pack(side=LEFT, fill=X, expand=1)
-        btn_pause.pack( side=LEFT, fill=X, expand=1)
-
+        btn_pause.pack(side=LEFT, fill=X, expand=1)
 
         btn_creeps_ecran.pack(side=LEFT, fill=X, expand=1)
         btn_upgrade_tour.pack(side=LEFT, fill=X, expand=1)
@@ -165,7 +172,6 @@ class Vue():
 
         # le canevas de jeu
         self.canevas = Canvas(self.root, width=1200, height=600, highlightthickness=0)
-
 
         btn_debuter_partie.bind("<Button-1>", self.parent.debuter_partie)
         btn_nouvelle_vague.bind("<Button-1>", self.parent.creer_niveau)
@@ -183,12 +189,11 @@ class Vue():
         self.img = ImageTk.PhotoImage(Image.open("./backgroundGrand.png"))
         self.canevas.create_image(0, 0, anchor=NW, image=self.img, tags=("background",))
 
-
         # filename = PhotoImage(file = "./backgroundGrand.png")
         # image = self.canevas.create_image(50,50,anchor=NW, image=filename)
 
         # img_label = Label(image=image)
-        #self.canevas.create_image(0, 0, image=image, anchor=NW)
+        # self.canevas.create_image(0, 0, image=image, anchor=NW)
         # img_label.pack()
         self.frame_bas.pack(expand=1, fill=BOTH)
 
@@ -206,9 +211,8 @@ class Vue():
         self.canevas.delete("projectile")
         self.canevas.delete("statique")
 
-
         if self.background == 0:
-            #self.canevas.create_rectangle(0, 600, 1200, 0, fill="#FFFFFF", tags="background")
+            # self.canevas.create_rectangle(0, 600, 1200, 0, fill="#FFFFFF", tags="background")
             self.background += 1
 
         self.canevas.tag_bind("background", "<Button-1>", self.creer_tour)
@@ -220,7 +224,8 @@ class Vue():
         for i in self.modele.partie.niveau.liste_creep_a_l_ecran:
             x = i.x1
             y = i.y1
-            self.canevas.create_oval(x - i.rayon, y - i.rayon, x + i.rayon, y + i.rayon, fill=i.couleur,tags=("dynamique"))
+            self.canevas.create_oval(x - i.rayon, y - i.rayon, x + i.rayon, y + i.rayon, fill=i.couleur,
+                                     tags=("dynamique"))
 
         for i in self.modele.partie.niveau.liste_de_projectile_a_l_ecran:
             if not i.creep_touche:
@@ -235,7 +240,8 @@ class Vue():
                 if i.couleur_projectile == 3:
                     couleur_projectile = "red"
 
-                self.canevas.create_oval(x_p - i.rayon, y_p - i.rayon, x_p + i.rayon, y_p + i.rayon, fill=couleur_projectile, tags="projectile")
+                self.canevas.create_oval(x_p - i.rayon, y_p - i.rayon, x_p + i.rayon, y_p + i.rayon,
+                                         fill=couleur_projectile, tags="projectile")
 
     def creer_tour(self, evt):
         couleur_tour = self.parent.modele.partie.couleur_choisie
@@ -245,12 +251,12 @@ class Vue():
                 self.canevas.create_oval(evt.x - tour_creee.rayon, evt.y - tour_creee.rayon,
                                          evt.x + tour_creee.rayon, evt.y + tour_creee.rayon,
                                          fill=None, tags=("statique"))
-        #TOUR BLEUE = VERT
-        #TOUR MAUVE = ROUGE
-        #TOUR BLANCHE = BLANCHE
-        #REFACTOR LORS DU MERGE
+        # TOUR BLEUE = VERT
+        # TOUR MAUVE = ROUGE
+        # TOUR BLANCHE = BLANCHE
+        # REFACTOR LORS DU MERGE
         if couleur_tour == 1:
-            couleur_tour = "#10B531" #GREEN
+            couleur_tour = "#10B531"  # GREEN
         if couleur_tour == 2:
             couleur_tour = "purple"
         if couleur_tour == 3:
@@ -259,7 +265,7 @@ class Vue():
             if couleur_tour != 0:
                 self.canevas.create_rectangle(evt.x + tour_creee.demitaillex, evt.y + tour_creee.demitailley,
                                               evt.x - tour_creee.demitaillex, evt.y - tour_creee.demitailley,
-                                              fill=couleur_tour, tags=("tour",tour_creee.id))
+                                              fill=couleur_tour, tags=("tour", tour_creee.id))
 
     def fin_partie(self):
         self.canevas.delete("statique")
@@ -268,9 +274,10 @@ class Vue():
                                     "Désirez-vous récupérer votre honneur?\n Appuyez débuter Partie",
                                     parent=self.parent.vue.root)
 
-    def choisir_tour(self,event):
+    def choisir_tour(self, event):
         pour_upgrade = self.canevas.gettags(CURRENT)
         print(pour_upgrade[1])
+
 
 class Modele():
     def __init__(self, parent):
@@ -294,7 +301,7 @@ class Modele():
         self.partie = None
 
     def nb_creeps(self, evt):
-        print("ÉCRAN" ,len(self.partie.niveau.liste_creep_a_l_ecran))
+        print("ÉCRAN", len(self.partie.niveau.liste_creep_a_l_ecran))
         print("ATTENTE", len(self.partie.niveau.liste_creep_attente))
 
     def creer_partie(self):
@@ -326,8 +333,6 @@ class Partie():
         self.cout_upgrade = 300
         self.ratio_upgrade = 1
 
-
-
     def creer_niveau(self, evt):
         self.niveau.liste_creep_a_l_ecran.clear()
         self.niveau_actuel += 1
@@ -354,24 +359,24 @@ class Partie():
         print("couleur Blanche(3) choisie")
         self.couleur_choisie = 3
 
-    def creer_tour(self,evt, couleur_tour):
+    def creer_tour(self, evt, couleur_tour):
         id = creer_id()
         tour_creee = None
         if self.total_argent > 100:
             if couleur_tour == 1:
                 if self.total_argent >= self.niveau.tour_bleue_valeur:
                     self.total_argent -= self.niveau.tour_bleue_valeur
-                    tour_creee = Tour_Bleu(self, evt.x, evt.y,id)
+                    tour_creee = Tour_Bleu(self, evt.x, evt.y, id)
 
             if couleur_tour == 2:
                 if self.total_argent >= self.niveau.tour_mauve_valeur:
                     self.total_argent -= self.niveau.tour_mauve_valeur
-                    tour_creee = Tour_Mauve(self, evt.x, evt.y,id)
+                    tour_creee = Tour_Mauve(self, evt.x, evt.y, id)
 
             if couleur_tour == 3:
                 if self.total_argent >= self.niveau.tour_blanche_valeur:
                     self.total_argent -= self.niveau.tour_blanche_valeur
-                    tour_creee = Tour_Blanche(self, evt.x, evt.y,id)
+                    tour_creee = Tour_Blanche(self, evt.x, evt.y, id)
 
         if tour_creee is not None:
             self.dictionnaire[id] = tour_creee
@@ -402,8 +407,6 @@ class Niveau():
         self.fin_niveau = False
         self.valeur_degat = 0.5
         self.creer_creeps()
-
-
 
     def jouer_tour(self):
 
@@ -448,18 +451,18 @@ class Niveau():
                 j.verification_range()
                 for k in self.liste_de_projectile_a_l_ecran:
                     if len(self.liste_de_projectile_a_l_ecran) != 0:
-                        if isinstance(k,Projectil_a):
+                        if isinstance(k, Projectil_a):
                             k.projectile_a_tete_chercheuse()
                             if k.creep_touche:
                                 self.liste_de_projectile_a_l_ecran.remove(k)
-                        if isinstance(k,Projectil_b):
-                            k.projectile_shotgun(self.liste_creep_a_l_ecran,j)
+                        if isinstance(k, Projectil_b):
+                            k.projectile_shotgun(self.liste_creep_a_l_ecran, j)
                             if k.creep_touche or k.out_of_bound:
-                                    self.liste_de_projectile_a_l_ecran.remove(k)
+                                self.liste_de_projectile_a_l_ecran.remove(k)
                         if isinstance(k, Projectil_c):
                             k.projectile_rebound(self.liste_creep_a_l_ecran)
                             if k.creep_touche:
-                                    self.liste_de_projectile_a_l_ecran.remove(k)
+                                self.liste_de_projectile_a_l_ecran.remove(k)
 
     def creer_creeps(self):
         if self.ratio_creep_vert > 0:
@@ -521,6 +524,8 @@ class Creep():
                 self.y1 = i[0][0][1]
                 self.debut = 1
 
+            #print(parent.parent.parent.sentier[0][self.i_pyth][0][0])
+
             distance = Helper.calcDistance(i[self.i_pyth][0][0], i[self.i_pyth][0][1], i[self.i_pyth][1][0],
                                            i[self.i_pyth][1][1])
             angle = Helper.calcAngle(i[self.i_pyth][0][0], i[self.i_pyth][0][1], i[self.i_pyth][1][0],
@@ -556,7 +561,7 @@ class Creep():
                             self.y1 = prochainpoint[1]
 
             if self.x1 == prochainpoint[0] and self.y1 == prochainpoint[1]:
-                if self.i_pyth <= len(i)-1:
+                if self.i_pyth <= len(i) - 1:
                     self.i_pyth += 1
                     self.x1 = prochainpoint[0]
                     self.y1 = prochainpoint[1]
@@ -641,17 +646,31 @@ class Tour():
             self.cooldown -= 1
 
     def tirer_creep(self, creep_cible):
-        if isinstance(self,Tour_Bleu):
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_a(self.position_x_tour, self.position_y_tour, creep_cible))
-        if isinstance(self,Tour_Mauve):
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(50), self.position_y_tour + random.randrange(50), creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(30), self.position_y_tour + random.randrange(30), creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(10), self.position_y_tour + random.randrange(10), creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(10), self.position_y_tour - random.randrange(10), creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(30), self.position_y_tour - random.randrange(30), creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(50), self.position_y_tour - random.randrange(50), creep_cible))
-        if isinstance(self,Tour_Blanche):
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_c(self.position_x_tour, self.position_y_tour, creep_cible))
+        if isinstance(self, Tour_Bleu):
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
+                Projectil_a(self.position_x_tour, self.position_y_tour, creep_cible))
+        if isinstance(self, Tour_Mauve):
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
+                Projectil_b(self.position_x_tour + random.randrange(50), self.position_y_tour + random.randrange(50),
+                            creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
+                Projectil_b(self.position_x_tour + random.randrange(30), self.position_y_tour + random.randrange(30),
+                            creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
+                Projectil_b(self.position_x_tour + random.randrange(10), self.position_y_tour + random.randrange(10),
+                            creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
+                Projectil_b(self.position_x_tour - random.randrange(10), self.position_y_tour - random.randrange(10),
+                            creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
+                Projectil_b(self.position_x_tour - random.randrange(30), self.position_y_tour - random.randrange(30),
+                            creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
+                Projectil_b(self.position_x_tour - random.randrange(50), self.position_y_tour - random.randrange(50),
+                            creep_cible))
+        if isinstance(self, Tour_Blanche):
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
+                Projectil_c(self.position_x_tour, self.position_y_tour, creep_cible))
 
 
 class Tour_Bleu(Tour):
@@ -738,7 +757,7 @@ class Projectil_b(Projectile):
         self.position_ini_x = 0
         self.position_ini_y = 0
 
-    def projectile_shotgun(self,listedecreep,tour):
+    def projectile_shotgun(self, listedecreep, tour):
 
         if self.unefois == 0:
             self.position_vise_x = self.creep_cible.x1
@@ -772,7 +791,8 @@ class Projectil_b(Projectile):
                     self.out_of_bound = True
 
         for i in listedecreep:
-            distance_projectile_verification = Helper.calcDistance(self.position_projectile_x,self.position_projectile_y, i.x1, i.y1)
+            distance_projectile_verification = Helper.calcDistance(self.position_projectile_x,
+                                                                   self.position_projectile_y, i.x1, i.y1)
             if distance_projectile_verification < i.rayon:
                 i.creep_touche = True
                 self.creep_touche = True
@@ -781,57 +801,57 @@ class Projectil_b(Projectile):
                     i.vie_creep -= self.degats
                     i.creep_touche = False
 
+
 class Projectil_c(Projectile):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
         Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
         self.couleur_projectile = 3
-        self.degats = 30
+        self.degats = 10
         self.vitesse_projectile = 20
         self.rayon = 5
         self.cible = 0
         self.rebound = 3
 
+    def projectile_rebound(self, liste_de_creep):
+        if self.cible < len(liste_de_creep):
+            distance_projectile = Helper.calcDistance(self.position_projectile_x, self.position_projectile_y,liste_de_creep[self.cible].x1, liste_de_creep[self.cible].y1)
+            angle_projectile = Helper.calcAngle(self.position_projectile_x, self.position_projectile_y,liste_de_creep[self.cible].x1, liste_de_creep[self.cible].y1)
+            cible_projectile = Helper.getAngledPoint(angle_projectile, self.vitesse_projectile,self.position_projectile_x, self.position_projectile_y)
 
-    def projectile_rebound(self,liste_de_creep):
+            self.position_projectile_x = cible_projectile[0]
+            self.position_projectile_y = cible_projectile[1]
 
-        distance_projectile = Helper.calcDistance(self.position_projectile_x, self.position_projectile_y,liste_de_creep[self.cible].x1, liste_de_creep[self.cible].y1)
-        angle_projectile = Helper.calcAngle(self.position_projectile_x, self.position_projectile_y, liste_de_creep[self.cible].x1,liste_de_creep[self.cible].y1)
-        cible_projectile = Helper.getAngledPoint(angle_projectile, self.vitesse_projectile, self.position_projectile_x,self.position_projectile_y)
+            if distance_projectile < liste_de_creep[self.cible].rayon:
+                liste_de_creep[self.cible].creep_touche = True
 
-        self.position_projectile_x = cible_projectile[0]
-        self.position_projectile_y = cible_projectile[1]
+            if liste_de_creep[self.cible].creep_touche:
+                if liste_de_creep[self.cible].vie_creep > 0:
+                    liste_de_creep[self.cible].vie_creep -= self.degats
+                    liste_de_creep[self.cible].creep_touche = False
 
-        if distance_projectile < liste_de_creep[self.cible].rayon:
-            liste_de_creep[self.cible].creep_touche = True
+                if liste_de_creep[self.cible].vie_creep < 0:
+                    self.rebound -= 1
 
-        if liste_de_creep[self.cible].creep_touche:
-            if liste_de_creep[self.cible].vie_creep > 0:
-                liste_de_creep[self.cible].vie_creep -= self.degats
-                liste_de_creep[self.cible].creep_touche = False
+                if liste_de_creep[self.cible].vie_creep > 0:
+                    self.cible += 1
 
-            if liste_de_creep[self.cible].vie_creep < 0:
-                self.rebound -= 1
+                if len(liste_de_creep) < 3:
+                    self.cible = 0
+                    self.rebound = 0
 
-            if liste_de_creep[self.cible].vie_creep > 0:
-                self.cible += 1
-
-            if len(liste_de_creep) < 3:
-                self.cible = 0
-                self.rebound = 0
-
-            if self.cible == self.rebound:
-                self.creep_touche = True
+                if self.cible == self.rebound:
+                    self.creep_touche = True
 
 
 class Projectil_d(Projectile):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
         Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
         self.couleur_projectile = 3
-        self.degats = 60 # 60
+        self.degats = 60  # 60
         self.vitesse_projectile = 40
         self.rayon = 5
 
-    def mine_tower(self,listedecreep,sentier):
+    def mine_tower(self, listedecreep, sentier):
 
         if self.unefois == 0:
             max = len(sentier[0])
@@ -866,7 +886,6 @@ class Projectil_d(Projectile):
                 self.position_projectile_y -= self.vitesse_projectile
                 if self.position_projectile_y < self.position_vise_y:
                     self.position_projectile_y = self.position_vise_y
-
 
         for i in listedecreep:
             distance_projectile_verification = Helper.calcDistance(self.position_projectile_x,
