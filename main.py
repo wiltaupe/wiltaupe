@@ -6,6 +6,12 @@ import time
 from helper import *
 from PIL import ImageTk, Image
 
+id = 0
+
+def creer_id():
+    global id
+    id += 1
+    return id
 
 class Vue():
     def __init__(self, parent):
@@ -198,7 +204,7 @@ class Vue():
         self.canevas.delete("dynamique")
         self.canevas.delete("sentier")
         self.canevas.delete("projectile")
-
+        self.canevas.delete("statique")
 
 
         if self.background == 0:
@@ -206,6 +212,7 @@ class Vue():
             self.background += 1
 
         self.canevas.tag_bind("background", "<Button-1>", self.creer_tour)
+        self.canevas.tag_bind("tour", "<Button-3>", self.choisir_tour)
 
         for i in self.modele.sentier[0]:
             self.canevas.create_line(i, width=40, fill="#AAAAAA", tags=("sentier"))
@@ -252,7 +259,7 @@ class Vue():
             if couleur_tour != 0:
                 self.canevas.create_rectangle(evt.x + tour_creee.demitaillex, evt.y + tour_creee.demitailley,
                                               evt.x - tour_creee.demitaillex, evt.y - tour_creee.demitailley,
-                                              fill=couleur_tour, tags=("statique"))
+                                              fill=couleur_tour, tags=("tour",tour_creee.id))
 
     def fin_partie(self):
         self.canevas.delete("statique")
@@ -260,6 +267,10 @@ class Vue():
         tkinter.messagebox.showinfo('Votre survie a échoué ',
                                     "Désirez-vous récupérer votre honneur?\n Appuyez débuter Partie",
                                     parent=self.parent.vue.root)
+
+    def choisir_tour(self,event):
+        pour_upgrade = self.canevas.gettags(CURRENT)
+        print(pour_upgrade[1])
 
 class Modele():
     def __init__(self, parent):
@@ -310,19 +321,12 @@ class Partie():
         self.creeps_tues = 0
         self.couleur_choisie = 0
         self.i = 1  # Utiliser pour l'augmentation de la sagesse de niveau
-        self.liste_tours = []
+        self.dictionnaire = {}
         self.total_bombes = 0
         self.cout_upgrade = 300
-        # self.projectile = Projectile(0, 0, 0)
-        # self.projectile_a = Projectil_a(0, 0, 0)
         self.ratio_upgrade = 1
 
-    # def upgrade_tours(self, evt):
-    #     if self.total_sagesse >= self.cout_upgrade:
-    #         self.total_sagesse -= self.cout_upgrade
-    #         self.projectile_a.degats *= (2 * self.ratio_upgrade)
-    #         self.ratio_upgrade += 0.5
-    #         print(self.projectile_a.degats)
+
 
     def creer_niveau(self, evt):
         self.niveau.liste_creep_a_l_ecran.clear()
@@ -351,27 +355,27 @@ class Partie():
         self.couleur_choisie = 3
 
     def creer_tour(self,evt, couleur_tour):
+        id = creer_id()
+        tour_creee = None
         if self.total_argent > 100:
             if couleur_tour == 1:
                 if self.total_argent >= self.niveau.tour_bleue_valeur:
                     self.total_argent -= self.niveau.tour_bleue_valeur
-                    tour_creee = Tour_Bleu(self, evt.x, evt.y)
-                    self.liste_tours.append(tour_creee)
-                    return tour_creee
+                    tour_creee = Tour_Bleu(self, evt.x, evt.y,id)
 
             if couleur_tour == 2:
                 if self.total_argent >= self.niveau.tour_mauve_valeur:
                     self.total_argent -= self.niveau.tour_mauve_valeur
-                    tour_creee = Tour_Mauve(self, evt.x, evt.y)
-                    self.liste_tours.append(tour_creee)
-                    return tour_creee
+                    tour_creee = Tour_Mauve(self, evt.x, evt.y,id)
 
             if couleur_tour == 3:
                 if self.total_argent >= self.niveau.tour_blanche_valeur:
                     self.total_argent -= self.niveau.tour_blanche_valeur
-                    tour_creee = Tour_Blanche(self, evt.x, evt.y)
-                    self.liste_tours.append(tour_creee)
-                    return tour_creee
+                    tour_creee = Tour_Blanche(self, evt.x, evt.y,id)
+
+        if tour_creee is not None:
+            self.dictionnaire[id] = tour_creee
+        return tour_creee
 
 
 class Niveau():
@@ -399,10 +403,6 @@ class Niveau():
         self.valeur_degat = 0.5
         self.creer_creeps()
 
-    # def upgrade_tours(self, evt):
-    #     for i in self.liste_de_projectile_a_l_ecran:
-    #         i.degats *= (2 * self.valeur_degat)
-    #         self.valeur_degat += 0.5
 
 
     def jouer_tour(self):
@@ -443,7 +443,8 @@ class Niveau():
         else:
             self.delai -= 1
 
-            for j in self.parent.liste_tours:
+            for j in self.parent.dictionnaire:
+                j = self.parent.dictionnaire[j]
                 j.verification_range()
                 for k in self.liste_de_projectile_a_l_ecran:
                     if len(self.liste_de_projectile_a_l_ecran) != 0:
@@ -654,30 +655,33 @@ class Tour():
 
 
 class Tour_Bleu(Tour):
-    def __init__(self, parent, x, y):
+    def __init__(self, parent, x, y, id):
         Tour.__init__(self, parent, x, y)
         self.valeur_monnetaire_tour = 500
         self.couleur_tour = 1
         self.cooldown_tower = 20
         self.rayon = 150
+        self.id = id
 
 
 class Tour_Mauve(Tour):
-    def __init__(self, parent, x, y):
+    def __init__(self, parent, x, y, id):
         Tour.__init__(self, parent, x, y)
         self.valeur_monnetaire_tour = 700
         self.couleur_tour = 2
         self.rayon = 200
         self.cooldown_tower = 30
+        self.id = id
 
 
 class Tour_Blanche(Tour):
-    def __init__(self, parent, x, y):
+    def __init__(self, parent, x, y, id):
         Tour.__init__(self, parent, x, y)
         self.valeur_monnetaire_tour = 1000
         self.couleur_tour = 3
         self.rayon = 500
         self.cooldown_tower = 40
+        self.id = id
 
 
 class Projectile(Partie):
@@ -696,8 +700,6 @@ class Projectile(Partie):
         self.cible = 0
         self.rebound = 0
 
-    # def upgrade_tours(self, evt):
-    #     self.degats += 100
 
 class Projectil_a(Projectile):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
