@@ -71,11 +71,11 @@ class Vue():
         label_vie = Label(frame_stats3, text="Vie:", textvariable=self.points_vie, bg="#000000",
                           borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
 
-        label_sagesse = Label(frame_stats4, text="Sagesse:", bg="#000000", borderwidth=3,
+        label_sagesse = Label(frame_stats4, text="Sagesse(௹):", bg="#000000", borderwidth=3,
                               relief="sunken", fg="#FFF", font="Courier 16 bold")
         label_sagesse_text = Label(frame_stats4, text="Vie:", textvariable=self.sagesse,
                                    bg="#000000", borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
-        label_argent = Label(frame_stats5, text="Argent:", bg="#000000", borderwidth=3,
+        label_argent = Label(frame_stats5, text="Argent(৳):", bg="#000000", borderwidth=3,
                              relief="sunken", fg="#FFF", font="Courier 16 bold")
         label_argent_text = Label(frame_stats5, text="Vie:", textvariable=self.argent, bg="#000000",
                                   borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
@@ -150,28 +150,31 @@ class Vue():
         # frame_infos_tour.pack(expand=1, fill=BOTH, side=LEFT)
         frame_bouttons.pack(expand=1, fill=BOTH, side=LEFT)
 
-        btn_tour_bleue = Button(frame_bouttons_row1, text="TOUR VERTE (500$)", bg="#000", fg="#fff",
+        btn_tour_bleue = Button(frame_bouttons_row1, text="TOUR VERTE 500৳ ", bg="#000", fg="#fff",
                                 font="courier 16 bold")
-        btn_tour_mauve = Button(frame_bouttons_row1, text="TOUR ROUGE (700$)", bg="#000", fg="#fff",
+        btn_tour_mauve = Button(frame_bouttons_row1, text=" TOUR ROUGE 700৳ ", bg="#000", fg="#fff",
                                 font="courier 16 bold")
-        btn_tour_blanche = Button(frame_bouttons_row1, text="TOUR BLANCHE (1000$)", bg="#000", fg="#fff",
+        btn_tour_blanche = Button(frame_bouttons_row1, text="TOUR BLANCHE 1000৳", bg="#000", fg="#fff",
                                   font="courier 16 bold")
 
         btn_debuter_partie = Button(frame_bouttons_row2, text="DÉBUTER PARTIE", bg="#000", fg="#fff",
                                     font="courier 16 bold")
         btn_nouvelle_vague = Button(frame_bouttons_row2, text="NOUVELLE VAGUE", bg="#000", fg="#fff",
                                     font="courier 16 bold")
-        btn_creeps_ecran = Button(frame_bouttons_row2, text="NB CREEPS À L'ÉCRAN", bg="#000", fg="#fff",
-                                  font="courier 16 bold")
-        btn_upgrade_tour = Button(frame_bouttons_row3, text="AMÉLIORER DÉGATS DES TOURS (300 SAGESSE)", bg="#000",
-                                  fg="#fff", font="courier 16 bold", )
         btn_pause = Button(frame_bouttons_row2, text="PAUSE", bg="#000", fg="#fff", font="courier 16 bold", )
 
         label_acheter_tours = Label(frame_bouttons, text="Acheter tours: ", bg="#000000", font="Courier 24 bold",
                                     fg="#FFF")
 
-        btn_mine = Button(frame_bouttons_row3, text="PLACER MINE (100$)", bg="#000", fg="#fff", font="courier 16 bold")
-        btn_bombe = Button(frame_bouttons_row3, text="BOMBA (1000$)", bg="#000", fg="#fff", font="courier 16 bold")
+        btn_mine = Button(frame_bouttons_row3, text="PLACER MINE 100৳", bg="#000", fg="#fff", font="courier 16 bold")
+        btn_bombe = Button(frame_bouttons_row3, text="BOMBA 1000৳", bg="#000", fg="#fff", font="courier 16 bold")
+
+        btn_upgrade_range = Button(frame_bouttons_row4, text="AMÉLIORER RANGE 300௹", bg="#000",
+                                  fg="#fff", font="courier 16 bold", )
+        btn_upgrade_degats = Button(frame_bouttons_row4, text="AMÉLIORER DÉGATS 300௹", bg="#000",
+                                  fg="#fff", font="courier 16 bold", )
+        btn_upgrade_special = Button(frame_bouttons_row4, text="AMÉLIORER SPÉCIAL 500௹", bg="#000",
+                                  fg="#fff", font="courier 16 bold", )
 
         # label_map.pack(side=LEFT, expand=1)
 
@@ -184,11 +187,13 @@ class Vue():
         btn_nouvelle_vague.pack(side=LEFT, fill=X, expand=1)
         btn_debuter_partie.pack(side=LEFT, fill=X, expand=1)
         btn_pause.pack(side=LEFT, fill=X, expand=1)
+        btn_upgrade_range.pack(side=LEFT, fill=X, expand=1)
+        btn_upgrade_degats.pack(side=LEFT, fill=X, expand=1)
+        btn_upgrade_special.pack(side=LEFT, fill=X, expand=1)
 
-        btn_creeps_ecran.pack(side=LEFT, fill=X, expand=1)
-        btn_upgrade_tour.pack(side=LEFT, fill=X, expand=1)
 
         frame_bouttons_row1.pack(fill=X, side=TOP)
+        frame_bouttons_row4.pack(fill=X, side=TOP)
         frame_bouttons_row3.pack(fill=X, side=TOP)
         frame_bouttons_row2.pack(fill=X, side=LEFT, expand=1)
 
@@ -200,7 +205,6 @@ class Vue():
         btn_tour_bleue.bind("<Button-1>", self.parent.choisir_couleur_bleu)
         btn_tour_mauve.bind("<Button-1>", self.parent.choisir_couleur_mauve)
         btn_tour_blanche.bind("<Button-1>", self.parent.choisir_couleur_blanche)
-        btn_creeps_ecran.bind("<Button-1>", self.modele.nb_creeps)
         # btn_upgrade_tour.bind("<Button-1>", self.parent.upgrade_tours)
         btn_pause.bind("<Button-1>", self.parent.pause)
         btn_mine.bind("<Button-1>", self.parent.choisir_mine)
@@ -318,13 +322,14 @@ class Vue():
             else:
                 nice_try = reponse1 + ", congratulations, votre performance est tout un exploit. " + str(self.modele.partie.total_points) + " points ont étés octroyés. Dommage que vous soyez le dernier humain vivant... "
 
-        if self.modele.partie.meilleur_score < self.modele.partie.total_points:
+            if self.modele.partie.meilleur_score < self.modele.partie.total_points:
 
-            with open("Score.txt", "w") as file1:
-                nouveau_record = reponse1 + " a juste fait " + str(self.modele.partie.total_points) + ' points'
-                file1.write(nouveau_record)
-        tkinter.messagebox.showinfo( 'Votre survie a échoué ',nice_try,
-                                    parent=self.parent.vue.root)
+                with open("Score.txt", "w") as file1:
+                    nouveau_record = reponse1 + " a juste fait " + str(self.modele.partie.total_points) + ' points'
+                    file1.write(nouveau_record)
+            tkinter.messagebox.showinfo( 'Votre survie a échoué ',nice_try,
+                                        parent=self.parent.vue.root)
+
 
     def choisir_tour(self, event):
         pour_upgrade = self.canevas.gettags(CURRENT)
@@ -410,10 +415,11 @@ class Partie():
         self.meilleur_score = 55
 
     def creer_niveau(self, evt):
-        self.niveau_actuel += 1
-        self.niveau.fin_niveau = False
-        self.total_bombes +=1
-        self.niveau.creer_creeps()
+        if len(self.niveau.liste_creep_a_l_ecran) == 0:
+            self.niveau_actuel += 1
+            self.niveau.fin_niveau = False
+            self.total_bombes +=1
+            self.niveau.creer_creeps()
 
     def augmenter_sagesse(self):
         augsag = 50 * self.i
@@ -632,7 +638,7 @@ class Creep():
         sen = parent.parent.parent.sentier
 
         if self.debut == 0:
-            self.x1 = sen[map][0][0][0]
+            self.x1 = sen[map][0][0][0] 
             self.y1 = sen[map][0][0][1]
             self.debut = 1
 
