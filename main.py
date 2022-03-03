@@ -153,12 +153,17 @@ class Vue():
         label_acheter_tours = Label(frame_bouttons, text="Acheter tours: ", bg="#000000", font="Courier 24 bold",
                                     fg="#FFF")
 
+        btn_mine = Button(frame_bouttons_row3, text="PLACER MINE (100$)", bg="#000", fg="#fff", font="courier 16 bold")
+        btn_bombe = Button(frame_bouttons_row3, text="BOMBA (1000$)", bg="#000", fg="#fff", font="courier 16 bold")
+
         # label_map.pack(side=LEFT, expand=1)
 
         label_acheter_tours.pack(fill=X)
         btn_tour_bleue.pack(side=LEFT, fill=X, expand=1)
         btn_tour_mauve.pack(side=LEFT, fill=X, expand=1)
         btn_tour_blanche.pack(side=LEFT, fill=X, expand=1)
+        btn_mine.pack(side=LEFT, fill=X, expand=1)
+        btn_bombe.pack(side=LEFT, fill=X, expand=1)
         btn_nouvelle_vague.pack(side=LEFT, fill=X, expand=1)
         btn_debuter_partie.pack(side=LEFT, fill=X, expand=1)
         btn_pause.pack(side=LEFT, fill=X, expand=1)
@@ -181,6 +186,8 @@ class Vue():
         btn_creeps_ecran.bind("<Button-1>", self.modele.nb_creeps)
         # btn_upgrade_tour.bind("<Button-1>", self.parent.upgrade_tours)
         btn_pause.bind("<Button-1>", self.parent.pause)
+        btn_mine.bind("<Button-1>", self.parent.choisir_mine)
+        btn_bombe.bind("<Button-1>", self.parent.choisir_bombe)
 
         # visualiser
         self.frame_stats.pack(fill=X)
@@ -242,6 +249,11 @@ class Vue():
 
                 self.canevas.create_oval(x_p - i.rayon, y_p - i.rayon, x_p + i.rayon, y_p + i.rayon,
                                          fill=couleur_projectile, tags="projectile")
+        for i in self.modele.partie.niveau.liste_de_mines_a_l_ecran:
+            if not i.creep_touche:
+                self.canevas.create_oval(i.x - i.rayon, i.y - i.rayon, i.x + i.rayon,
+                                         i.y + i.rayon, fill="brown",
+                                         tags="dynamique")
 
     def creer_tour(self, evt):
         couleur_tour = self.parent.modele.partie.couleur_choisie
@@ -267,6 +279,9 @@ class Vue():
                                               evt.x - tour_creee.demitaillex, evt.y - tour_creee.demitailley,
                                               fill=couleur_tour, tags=("tour", tour_creee.id))
 
+    def placer_mine(self, evt):
+        mine_creee = self.parent.modele.partie.niveau.creer_mine(evt)
+
     def fin_partie(self):
         self.canevas.delete("statique")
         self.canevas.delete("dynamique")
@@ -284,7 +299,7 @@ class Modele():
     def __init__(self, parent):
         self.parent = parent
         self.partie = None
-        self.sentier_choisi = 1
+        self.sentier_choisi = 0
         self.sentier = [
             #premier sentier
             [
@@ -408,6 +423,7 @@ class Niveau():
         self.liste_creep_attente = []
         self.liste_creep_a_l_ecran = []
         self.liste_de_projectile_a_l_ecran = []
+        self.liste_de_mines_a_l_ecran = []
         self.niveau_est_parfait = True
         self.bonus_niveau_parfait = 30
         self.ratio_bonus_niveau = 1.5
@@ -421,7 +437,10 @@ class Niveau():
         self.tour_mauve_valeur = 700
         self.tour_blanche_valeur = 1000
         self.fin_niveau = False
+        self.mine_valeur = 100
+        self.bombe_valeur = 100
         self.valeur_degat = 0.5
+
         self.creer_creeps()
 
     def jouer_tour(self):
@@ -505,6 +524,19 @@ class Niveau():
         if len(self.liste_creep_attente) >= 0:
             tmp = self.liste_creep_attente.pop(0)
             self.liste_creep_a_l_ecran.append(tmp)
+
+    def creer_mine(self, evt):
+        if self.parent.total_argent >= self.mine_valeur:
+            self.parent.total_argent -= self.mine_valeur
+            mine_creee = Mine(evt.x, evt.y, self)
+            self.liste_de_mines_a_l_ecran.append(mine_creee)
+            return mine_creee
+
+    def detonation_bombe(self, evt):
+        if self.parent.total_argent >= self.bombe_valeur:
+            self.parent.total_argent -= self.bombe_valeur
+            for i in self.liste_creep_a_l_ecran:
+                i.vie_creep -= 75
 
 
 class Creep():
@@ -915,6 +947,27 @@ class Projectil_d(Projectile):
                     i.vie_creep -= self.degats
 
 
+class Mine():
+    def __init__(self, position_mine_x, position_mine_y, niveau):
+        self.parent = niveau
+        self.x = position_mine_x
+        self.y = position_mine_y
+        self.degats = 60
+        self.rayon = 10
+        self.creep_touche = False
+        self.liste_creep_sur_mine = []
+        # self.couleur_mine = "brown"
+
+    def detonation_mine(self, liste_creep):
+        print("boom\n\n")
+        self.creep_touche = True
+        if self.creep_touche:
+            self.parent.liste_de_mines_a_l_ecran.remove(self)
+        for i in liste_creep:
+            i.creep_touche = True
+            if i.vie_creep > 0:
+                i.vie_creep -= self.degats
+
 class Controleur():
     def __init__(self):
         self.partie_en_cours = 0
@@ -960,6 +1013,15 @@ class Controleur():
     def choisir_couleur_blanche(self, evt):
         if self.partie_en_cours != 0:
             self.modele.partie.choisir_couleur_blanche()
+
+    def choisir_mine(self, evt):        #cette fct ne fait rien d'important à date
+        if self.partie_en_cours != 0:
+            print("mine sélectionnée")
+
+    def choisir_bombe(self, evt):        #cette fct ne fait rien d'important à date
+        if self.partie_en_cours != 0:
+            print("bombe sélectionnée")
+            self.modele.partie.niveau.detonation_bombe(evt)
 
     def creer_tour(self, evt, couleur_tour):
         return self.modele.partie.creer_tour(evt, couleur_tour)
