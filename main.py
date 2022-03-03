@@ -224,6 +224,7 @@ class Vue():
 
         self.canevas.tag_bind("background", "<Button-1>", self.creer_tour)
         self.canevas.tag_bind("tour", "<Button-3>", self.choisir_tour)
+        self.canevas.tag_bind("sentier", "<Button-1>", self.placer_mine)
 
         for i in self.modele.sentier[self.parent.modele.sentier_choisi]:
             self.canevas.create_line(i, width=40, fill="#AAAAAA", tags=("sentier"))
@@ -280,7 +281,7 @@ class Vue():
                                               fill=couleur_tour, tags=("tour", tour_creee.id))
 
     def placer_mine(self, evt):
-        mine_creee = self.parent.modele.partie.niveau.creer_mine(evt)
+        self.parent.modele.partie.niveau.creer_mine(evt)
 
     def fin_partie(self):
         self.canevas.delete("statique")
@@ -552,7 +553,8 @@ class Creep():
         self.troncon = 0
         self.debut = 0
         self.i_pyth = 0
-
+        self.cooldown = 0
+        self.cooldown_mine = 30
         self.creep_touche = False
         self.est_cible = False
         self.est_vivant = False
@@ -560,6 +562,7 @@ class Creep():
         self.faiblesse_a = False
         self.faiblesse_b = False
         self.faiblesse_c = False
+
 
     def jouer_tour(self, parent):
         self.deplacement(parent)
@@ -614,6 +617,22 @@ class Creep():
                 self.i_pyth += 1
                 self.x1 = prochainpoint[0]
                 self.y1 = prochainpoint[1]
+
+        if self.cooldown > 0:
+            self.cooldown -= 1
+        if self.cooldown == 0:
+            for i in parent.liste_de_mines_a_l_ecran:
+                for j in parent.liste_creep_a_l_ecran:
+                    distance_mine_verif = Helper.calcDistance(i.x, i.y, j.x1, j.y1)
+
+                    if distance_mine_verif < (i.rayon + j.rayon):
+                        i.liste_creep_sur_mine.append(j)
+
+                if len(i.liste_creep_sur_mine) != 0:
+
+                    i.detonation_mine(i.liste_creep_sur_mine)
+                    i.liste_creep_sur_mine = []
+            self.cooldown = self.cooldown_mine
 
 
 class Creep_vert(Creep):
