@@ -575,12 +575,17 @@ class Niveau():
             tmp = self.liste_creep_attente.pop(0)
             self.liste_creep_a_l_ecran.append(tmp)
 
+    def cliquer_mine(self, evt):
+        self.mine_cliquee = True
+
     def creer_mine(self, evt):
-        if self.parent.total_argent >= self.mine_valeur:
-            self.parent.total_argent -= self.mine_valeur
-            mine_creee = Mine(evt.x, evt.y, self)
-            self.liste_de_mines_a_l_ecran.append(mine_creee)
-            return mine_creee
+        if self.mine_cliquee:
+            if self.parent.total_argent >= self.mine_valeur:
+                self.parent.total_argent -= self.mine_valeur
+                mine_creee = Mine(evt.x, evt.y, self)
+                self.liste_de_mines_a_l_ecran.append(mine_creee)
+                self.parent.couleur_choisie = 0
+                return mine_creee
 
     def detonation_bombe(self, evt):
         if self.parent.total_argent >= self.bombe_valeur:
@@ -590,6 +595,7 @@ class Niveau():
                 self.parent.total_bombes -=1
                 for i in self.liste_creep_a_l_ecran:
                     i.vie_creep -= 75
+                self.parent.couleur_choisie = 0
 
 
 class Creep():
@@ -1018,14 +1024,15 @@ class Controleur():
         if self.partie_en_cours != 0:
             self.modele.partie.choisir_couleur_blanche()
 
-    def choisir_mine(self, evt):        #cette fct ne fait rien d'important à date
-        # if self.partie_en_cours != 0:
-        print("mine sélectionnée")
+    def choisir_mine(self, evt):
+        if self.partie_en_cours != 0:
+            self.modele.partie.niveau.cliquer_mine(evt)
+            print("mine sélectionnée")
 
-    def choisir_bombe(self, evt):        #cette fct ne fait rien d'important à date
-        # if self.partie_en_cours != 0:
-        print("bombe sélectionnée")
-        self.modele.partie.niveau.detonation_bombe(evt)
+    def choisir_bombe(self, evt):
+        if self.partie_en_cours != 0:
+            print("bombe sélectionnée")
+            self.modele.partie.niveau.detonation_bombe(evt)
 
     def creer_tour(self, evt, couleur_tour):
         return self.modele.partie.creer_tour(evt, couleur_tour)
