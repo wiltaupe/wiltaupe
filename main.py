@@ -5,6 +5,7 @@ from tkinter import simpledialog
 import time
 from helper import *
 from PIL import ImageTk, Image
+import re
 
 id = 0
 
@@ -35,11 +36,13 @@ class Vue():
         frame_stats2 = Frame(self.frame_stats, bg="#000000")
         frame_stats3 = Frame(self.frame_stats, bg="#000000")
         frame_stats4 = Frame(self.frame_stats, bg="#000000")
+        frame_stats5 = Frame(self.frame_stats, bg="#000000")
 
         frame_stats1.pack(side=LEFT, expand=1)
         frame_stats2.pack(side=LEFT, expand=1)
         frame_stats3.pack(side=LEFT, expand=1)
         frame_stats4.pack(side=LEFT, expand=1)
+        frame_stats5.pack(side=LEFT, expand=1)
 
         self.points_vie = StringVar()
         self.points_vie.set("0")
@@ -49,36 +52,50 @@ class Vue():
         self.sagesse.set("0")
         self.argent = StringVar()
         self.argent.set("0")
+        self.meilleur_score = StringVar()
+        self.meilleur_score.set("0")
 
-        label_vie_text = Label(frame_stats1, text="Vie:", bg="#000000", borderwidth=3,
-                               relief="sunken", font="Courier 16 bold", fg="#FFF")
-        label_vie = Label(frame_stats1, text="Vie:", textvariable=self.points_vie, bg="#000000",
-                          borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
+
+        label_meilleur_score = Label(frame_stats1, text="High Score:", bg="#000000", borderwidth=3,
+                                     relief="sunken", fg="#FFF", font="Courier 16 bold")
+        label_meilleur_score_text =Label(frame_stats1, text="Vie:", textvariable=self.meilleur_score, bg="#000000",
+                                         borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
 
         label_score = Label(frame_stats2, text="Score:", bg="#000000", borderwidth=3,
                             relief="sunken", fg="#FFF", font="Courier 16 bold")
         label_score_text = Label(frame_stats2, text="Vie:", textvariable=self.score, bg="#000000",
                                  borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
-        label_sagesse = Label(frame_stats3, text="Sagesse:", bg="#000000", borderwidth=3,
+
+        label_vie_text = Label(frame_stats3, text="Vie:", bg="#000000", borderwidth=3,
+                               relief="sunken", font="Courier 16 bold", fg="#FFF")
+        label_vie = Label(frame_stats3, text="Vie:", textvariable=self.points_vie, bg="#000000",
+                          borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
+
+        label_sagesse = Label(frame_stats4, text="Sagesse:", bg="#000000", borderwidth=3,
                               relief="sunken", fg="#FFF", font="Courier 16 bold")
-        label_sagesse_text = Label(frame_stats3, text="Vie:", textvariable=self.sagesse,
+        label_sagesse_text = Label(frame_stats4, text="Vie:", textvariable=self.sagesse,
                                    bg="#000000", borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
-        label_argent = Label(frame_stats4, text="Argent:", bg="#000000", borderwidth=3,
+        label_argent = Label(frame_stats5, text="Argent:", bg="#000000", borderwidth=3,
                              relief="sunken", fg="#FFF", font="Courier 16 bold")
-        label_argent_text = Label(frame_stats4, text="Vie:", textvariable=self.argent, bg="#000000",
+        label_argent_text = Label(frame_stats5, text="Vie:", textvariable=self.argent, bg="#000000",
                                   borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
 
-        label_vie_text.pack(expand=1)
-        label_vie.pack(expand=1)
+
 
         label_score.pack(expand=1)
         label_score_text.pack(expand=1)
+
+        label_vie_text.pack(expand=1)
+        label_vie.pack(expand=1)
 
         label_sagesse.pack(expand=1)
         label_sagesse_text.pack(expand=1)
 
         label_argent.pack(expand=1)
         label_argent_text.pack(expand=1)
+
+        label_meilleur_score.pack(expand=1)
+        label_meilleur_score_text.pack(expand=1)
 
         # BOTTOM FRAME
         self.frame_bas = Frame(self.root, bg="#7FB069")
@@ -212,6 +229,7 @@ class Vue():
         self.niveau.set(str(self.modele.partie.niveau_actuel))
         self.bombes.set(str(self.modele.partie.total_bombes))
         self.nbcreepstues.set(str(self.modele.partie.creeps_tues))
+        self.meilleur_score.set(str(self.modele.partie.meilleur_score))
 
         self.canevas.delete("dynamique")
         self.canevas.delete("sentier")
@@ -288,8 +306,24 @@ class Vue():
         self.canevas.delete("statique")
         self.canevas.delete("dynamique")
         self.canevas.delete("tour")
-        tkinter.messagebox.showinfo('Votre survie a échoué ',
-                                    "Désirez-vous récupérer votre honneur?\n Appuyez débuter Partie",
+
+        reponse1 = tkinter.simpledialog.askstring("Score", "Quel est votre nom?",
+                                                  parent=self.parent.vue.root)
+
+
+        if reponse1 is not None:
+            if(self.modele.partie.total_points<self.modele.partie.meilleur_score):
+                nice_try = reponse1 + ", votre performance laisse à désirer " + str(self.modele.partie.total_points) + " points ont étés octroyés. Vous êtes une honte pour l'humanité."
+
+            else:
+                nice_try = reponse1 + ", congratulations, votre performance est tout un exploit. " + str(self.modele.partie.total_points) + " points ont étés octroyés. Dommage que vous soyez le dernier humain vivant... "
+
+        if self.modele.partie.meilleur_score < self.modele.partie.total_points:
+
+            with open("Score.txt", "w") as file1:
+                nouveau_record = reponse1 + " a juste fait " + str(self.modele.partie.total_points) + ' points'
+                file1.write(nouveau_record)
+        tkinter.messagebox.showinfo( 'Votre survie a échoué ',nice_try,
                                     parent=self.parent.vue.root)
 
     def choisir_tour(self, event):
@@ -301,7 +335,7 @@ class Modele():
     def __init__(self, parent):
         self.parent = parent
         self.partie = None
-        self.sentier_choisi = 1
+        self.sentier_choisi = 0
         self.sentier = [
             #premier sentier
             [
@@ -339,10 +373,18 @@ class Modele():
 
     def creer_partie(self):
         self.partie = Partie(self)
+        self.lire_highscore()
         print("Partie créée :", self.partie)
 
     def jouer_tour(self):
         self.partie.jouer_tour()
+
+    def lire_highscore(self):
+        with open("Score.txt", "r") as file1:
+            meilleur_score = file1.read()
+        matches = re.findall("[+-]?\d+", meilleur_score)
+        self.partie.meilleur_score = int(matches[0])
+        return self.partie.meilleur_score
 
     # def upgrade_tours(self, evt):
     #     self.partie.upgrade_tours(evt)
@@ -365,11 +407,12 @@ class Partie():
         self.total_bombes = 0
         self.cout_upgrade = 300
         self.ratio_upgrade = 1
+        self.meilleur_score = 55
 
     def creer_niveau(self, evt):
-        self.niveau.liste_creep_a_l_ecran.clear()
         self.niveau_actuel += 1
         self.niveau.fin_niveau = False
+        self.total_bombes +=1
         self.niveau.creer_creeps()
 
     def augmenter_sagesse(self):
@@ -413,7 +456,6 @@ class Partie():
 
         if tour_creee is not None:
             self.dictionnaire[id] = tour_creee
-
         return tour_creee
 
 
@@ -443,6 +485,7 @@ class Niveau():
         self.mine_valeur = 100
         self.bombe_valeur = 100
         self.valeur_degat = 0.5
+
         self.creer_creeps()
         self.pour_shotgun = None
 
@@ -541,9 +584,12 @@ class Niveau():
 
     def detonation_bombe(self, evt):
         if self.parent.total_argent >= self.bombe_valeur:
-            self.parent.total_argent -= self.bombe_valeur
-            for i in self.liste_creep_a_l_ecran:
-                i.vie_creep -= 75
+            if self.parent.total_bombes>0:
+
+                self.parent.total_argent -= self.bombe_valeur
+                self.parent.total_bombes -=1
+                for i in self.liste_creep_a_l_ecran:
+                    i.vie_creep -= 75
 
 
 class Creep():
@@ -948,6 +994,7 @@ class Controleur():
         if not self.partie_en_cours:
             self.partie_en_cours = 1
             self.modele.creer_partie()
+
             self.jouer_partie()
 
     def jouer_partie(self):
@@ -972,13 +1019,13 @@ class Controleur():
             self.modele.partie.choisir_couleur_blanche()
 
     def choisir_mine(self, evt):        #cette fct ne fait rien d'important à date
-        if self.partie_en_cours != 0:
-            print("mine sélectionnée")
+        # if self.partie_en_cours != 0:
+        print("mine sélectionnée")
 
     def choisir_bombe(self, evt):        #cette fct ne fait rien d'important à date
-        if self.partie_en_cours != 0:
-            print("bombe sélectionnée")
-            self.modele.partie.niveau.detonation_bombe(evt)
+        # if self.partie_en_cours != 0:
+        print("bombe sélectionnée")
+        self.modele.partie.niveau.detonation_bombe(evt)
 
     def creer_tour(self, evt, couleur_tour):
         return self.modele.partie.creer_tour(evt, couleur_tour)
