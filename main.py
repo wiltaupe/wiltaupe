@@ -284,7 +284,7 @@ class Modele():
     def __init__(self, parent):
         self.parent = parent
         self.partie = None
-        self.sentier_choisi = 0
+        self.sentier_choisi = 1
         self.sentier = [
             #premier sentier
             [
@@ -462,23 +462,23 @@ class Niveau():
         else:
             self.delai -= 1
 
-            for j in self.parent.dictionnaire:
-                j = self.parent.dictionnaire[j]
-                j.verification_range()
-                for k in self.liste_de_projectile_a_l_ecran:
-                    if len(self.liste_de_projectile_a_l_ecran) != 0:
-                        if isinstance(k, Projectil_a):
-                            k.projectile_a_tete_chercheuse()
-                            if k.creep_touche:
-                                self.liste_de_projectile_a_l_ecran.remove(k)
-                        if isinstance(k, Projectil_b):
-                            k.projectile_shotgun(self.liste_creep_a_l_ecran, j)
-                            if k.creep_touche or k.out_of_bound:
-                                self.liste_de_projectile_a_l_ecran.remove(k)
-                        if isinstance(k, Projectil_c):
-                            k.projectile_rebound(self.liste_creep_a_l_ecran)
-                            if k.creep_touche:
-                                self.liste_de_projectile_a_l_ecran.remove(k)
+        for j in self.parent.dictionnaire:
+            j = self.parent.dictionnaire[j]
+            j.verification_range()
+            for k in self.liste_de_projectile_a_l_ecran:
+                if len(self.liste_de_projectile_a_l_ecran) != 0:
+                    if isinstance(k, Projectil_a):
+                        k.projectile_a_tete_chercheuse()
+                        if k.creep_touche:
+                            self.liste_de_projectile_a_l_ecran.remove(k)
+                    if isinstance(k, Projectil_b):
+                        k.projectile_shotgun(self.liste_creep_a_l_ecran, j)
+                        if k.creep_touche or k.out_of_bound:
+                            self.liste_de_projectile_a_l_ecran.remove(k)
+                    if isinstance(k, Projectil_c):
+                        k.projectile_rebound(self.liste_creep_a_l_ecran)
+                        if k.creep_touche:
+                            self.liste_de_projectile_a_l_ecran.remove(k)
 
     def creer_creeps(self):
         if self.ratio_creep_vert > 0:
@@ -553,31 +553,31 @@ class Creep():
             if self.x1 < prochainpoint[0]:
                 for j in range(self.vitesse_creep_X):
                     self.x1 += 1
-                    if self.x1 > prochainpoint[0]:
-                        self.x1 = prochainpoint[0]
+                    if self.x1 >= prochainpoint[0]:
+                        self.x1 = round(prochainpoint[0])
 
         if sen[map][self.i_pyth][0][0] > sen[map][self.i_pyth][1][0]:
             if self.x1 > prochainpoint[0]:
                 for j in range(self.vitesse_creep_X):
                     self.x1 -= 1
-                    if self.x1 < prochainpoint[0]:
-                        self.x1 = prochainpoint[0]
+                    if self.x1 <= prochainpoint[0]:
+                        self.x1 = round(prochainpoint[0])
 
         if sen[map][self.i_pyth][0][1] < sen[map][self.i_pyth][1][1]:
             if self.y1 < prochainpoint[1]:
                 for j in range(self.vitesse_creep_Y):
                     self.y1 += 1
-                    if self.y1 > prochainpoint[1]:
-                        self.y1 = prochainpoint[1]
+                    if self.y1 >= prochainpoint[1]:
+                        self.y1 = round(prochainpoint[1])
 
         if sen[map][self.i_pyth][0][1] > sen[map][self.i_pyth][1][1]:
             if self.y1 > prochainpoint[1]:
                 for j in range(self.vitesse_creep_Y):
                     self.y1 -= 1
-                    if self.y1 < prochainpoint[1]:
-                        self.y1 = prochainpoint[1]
+                    if self.y1 <= prochainpoint[1]:
+                        self.y1 = round(prochainpoint[1])
 
-        if self.x1 == prochainpoint[0] and self.y1 == prochainpoint[1]:
+        if self.x1 == round(prochainpoint[0]) and self.y1 == round(prochainpoint[1]):
             if self.i_pyth <= len(sen[map]) - 1:
                 self.i_pyth += 1
                 self.x1 = prochainpoint[0]
