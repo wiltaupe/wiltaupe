@@ -264,6 +264,7 @@ class Vue():
                 self.canevas.create_oval(evt.x - tour_creee.rayon, evt.y - tour_creee.rayon,
                                          evt.x + tour_creee.rayon, evt.y + tour_creee.rayon,
                                          fill=None, tags=("statique"))
+
         # TOUR BLEUE = VERT
         # TOUR MAUVE = ROUGE
         # TOUR BLANCHE = BLANCHE
@@ -300,7 +301,7 @@ class Modele():
     def __init__(self, parent):
         self.parent = parent
         self.partie = None
-        self.sentier_choisi = 0
+        self.sentier_choisi = 1
         self.sentier = [
             #premier sentier
             [
@@ -316,12 +317,12 @@ class Modele():
                 [[1000, 240], [100, 240]],
                 [[100, 240], [100, 120]],
                 [[100, 120], [800, 120]],
-                [[800, 120], [800, 550]],
-                [[800, 550], [1100, 550]],
-                [[1100, 550], [1100, 500]],
-                [[1100, 500], [100, 500]],
-                [[100, 500], [100, 400]],
-                [[100, 400], [1400, 400]]
+                [[800, 120], [800, 575]],
+                [[800, 575], [1100, 575]],
+                [[1100, 575], [1100, 475]],
+                [[1100, 475], [100, 475]],
+                [[100, 475], [100, 350]],
+                [[100, 350], [1400, 350]]
             ]
         ]
 
@@ -412,6 +413,7 @@ class Partie():
 
         if tour_creee is not None:
             self.dictionnaire[id] = tour_creee
+
         return tour_creee
 
 
@@ -441,8 +443,8 @@ class Niveau():
         self.mine_valeur = 100
         self.bombe_valeur = 100
         self.valeur_degat = 0.5
-
         self.creer_creeps()
+        self.pour_shotgun = None
 
     def jouer_tour(self):
 
@@ -483,22 +485,26 @@ class Niveau():
             self.delai -= 1
 
         for j in self.parent.dictionnaire:
-            j = self.parent.dictionnaire[j]
-            j.verification_range()
-            for k in self.liste_de_projectile_a_l_ecran:
-                if len(self.liste_de_projectile_a_l_ecran) != 0:
-                    if isinstance(k, Projectil_a):
-                        k.projectile_a_tete_chercheuse()
-                        if k.creep_touche:
-                            self.liste_de_projectile_a_l_ecran.remove(k)
-                    if isinstance(k, Projectil_b):
-                        k.projectile_shotgun(self.liste_creep_a_l_ecran, j)
-                        if k.creep_touche or k.out_of_bound:
-                            self.liste_de_projectile_a_l_ecran.remove(k)
-                    if isinstance(k, Projectil_c):
-                        k.projectile_rebound(self.liste_creep_a_l_ecran)
-                        if k.creep_touche:
-                            self.liste_de_projectile_a_l_ecran.remove(k)
+            l = self.parent.dictionnaire[j]
+            l.verification_range()
+            self.pour_shotgun = self.parent.dictionnaire[j]
+
+        for k in self.liste_de_projectile_a_l_ecran:
+            if len(self.liste_de_projectile_a_l_ecran) != 0:
+                if isinstance(k, Projectil_a):
+                    k.projectile_a_tete_chercheuse()
+                    if k.creep_touche:
+                        self.liste_de_projectile_a_l_ecran.remove(k)
+                if isinstance(k, Projectil_b):
+                    k.projectile_shotgun(self.liste_creep_a_l_ecran,self.pour_shotgun)
+                    if k.creep_touche or k.out_of_bound:
+                        self.liste_de_projectile_a_l_ecran.remove(k)
+                if isinstance(k, Projectil_c):
+                    k.projectile_rebound(self.liste_creep_a_l_ecran)
+                    if not self.liste_creep_a_l_ecran:
+                        self.liste_de_projectile_a_l_ecran.remove(k)
+                    if k.creep_touche:
+                        self.liste_de_projectile_a_l_ecran.remove(k)
 
     def creer_creeps(self):
         if self.ratio_creep_vert > 0:
@@ -715,27 +721,14 @@ class Tour():
 
     def tirer_creep(self, creep_cible):
         if isinstance(self, Tour_Bleu):
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
-                Projectil_a(self.position_x_tour, self.position_y_tour, creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_a(self.position_x_tour, self.position_y_tour, creep_cible))
         if isinstance(self, Tour_Mauve):
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
-                Projectil_b(self.position_x_tour + random.randrange(50), self.position_y_tour + random.randrange(50),
-                            creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
-                Projectil_b(self.position_x_tour + random.randrange(30), self.position_y_tour + random.randrange(30),
-                            creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
-                Projectil_b(self.position_x_tour + random.randrange(10), self.position_y_tour + random.randrange(10),
-                            creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
-                Projectil_b(self.position_x_tour - random.randrange(10), self.position_y_tour - random.randrange(10),
-                            creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
-                Projectil_b(self.position_x_tour - random.randrange(30), self.position_y_tour - random.randrange(30),
-                            creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
-                Projectil_b(self.position_x_tour - random.randrange(50), self.position_y_tour - random.randrange(50),
-                            creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(50), self.position_y_tour + random.randrange(50),creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(30), self.position_y_tour + random.randrange(30),creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(10), self.position_y_tour + random.randrange(10),creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(10), self.position_y_tour - random.randrange(10),creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(30), self.position_y_tour - random.randrange(30),creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(50), self.position_y_tour - random.randrange(50),creep_cible))
         if isinstance(self, Tour_Blanche):
             self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
                 Projectil_c(self.position_x_tour, self.position_y_tour, creep_cible))
@@ -911,61 +904,6 @@ class Projectil_c(Projectile):
                     self.creep_touche = True
 
 
-class Projectil_d(Projectile):
-    def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
-        Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
-        self.couleur_projectile = 3
-        self.degats = 60  # 60
-        self.vitesse_projectile = 40
-        self.rayon = 5
-
-    def mine_tower(self, listedecreep, sentier):
-
-        if self.unefois == 0:
-            max = len(sentier[0])
-            max_mine = max - 1
-
-            self.position_vise_x = sentier[0][max_mine][0][0]
-            self.position_vise_y = sentier[0][max_mine][0][1]
-            self.unefois += 1
-            self.position_ini_x = self.position_projectile_x
-            self.position_ini_y = self.position_projectile_y
-
-        if self.position_ini_x < self.position_vise_x:
-            if self.position_projectile_x < self.position_vise_x:
-                self.position_projectile_x += self.vitesse_projectile
-                if self.position_projectile_x > self.position_vise_x:
-                    self.position_projectile_x = self.position_vise_x
-
-        if self.position_ini_x > self.position_vise_x:
-            if self.position_projectile_x > self.position_vise_x:
-                self.position_projectile_x -= self.vitesse_projectile
-                if self.position_projectile_x < self.position_vise_x:
-                    self.position_projectile_x = self.position_vise_x
-
-        if self.position_ini_y < self.position_vise_y:
-            if self.position_projectile_y < self.position_vise_y:
-                self.position_projectile_y += self.vitesse_projectile
-                if self.position_projectile_y > self.position_vise_y:
-                    self.position_projectile_y = self.position_vise_y
-
-        if self.position_ini_y > self.position_vise_y:
-            if self.position_projectile_y > self.position_vise_y:
-                self.position_projectile_y -= self.vitesse_projectile
-                if self.position_projectile_y < self.position_vise_y:
-                    self.position_projectile_y = self.position_vise_y
-
-        for i in listedecreep:
-            distance_projectile_verification = Helper.calcDistance(self.position_projectile_x,
-                                                                   self.position_projectile_y, i.x1, i.y1)
-            if distance_projectile_verification < i.rayon:
-                i.creep_touche = True
-                self.creep_touche = True
-            if i.creep_touche:
-                if i.vie_creep > 0:
-                    i.vie_creep -= self.degats
-
-
 class Mine():
     def __init__(self, position_mine_x, position_mine_y, niveau):
         self.parent = niveau
@@ -1048,8 +986,6 @@ class Controleur():
     def creer_niveau(self, evt):
         self.modele.partie.creer_niveau(evt)
 
-    # def upgrade_tours(self, evt):
-    #     self.modele.upgrade_tours(evt)
 
 
 if __name__ == '__main__':
