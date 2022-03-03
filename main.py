@@ -686,10 +686,14 @@ class Creep():
                     if distance_mine_verif < (i.rayon + j.rayon):
                         i.liste_creep_sur_mine.append(j)
 
+                    if isinstance(j, Boss):
+                        self.cooldown_mine = 0
+
                 if len(i.liste_creep_sur_mine) != 0:
 
                     i.detonation_mine(i.liste_creep_sur_mine)
                     i.liste_creep_sur_mine = []
+
             self.cooldown = self.cooldown_mine
 
 
@@ -1008,6 +1012,7 @@ class Controleur():
             if not self.pause_en_cours:
                 self.modele.jouer_tour()
                 self.vue.afficher_partie()
+                #print(self.vue.canevas.find_all())
                 self.vue.root.after(40, self.jouer_partie)
         else:
             self.vue.fin_partie()
