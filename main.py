@@ -419,8 +419,8 @@ class Partie():
         self.total_creep_tues = 0
         self.total_points = 0
         self.total_vie = 100
-        self.total_argent = 100000
-        self.total_sagesse = 600000
+        self.total_argent = 1000
+        self.total_sagesse = 200
         self.niveau_actuel = 1
         self.niveau = Niveau(self, self.niveau_actuel)
         self.creeps_tues = 0
@@ -431,24 +431,27 @@ class Partie():
         self.cout_upgrade = 300
         self.ratio_upgrade = 1
         self.meilleur_score = 55
+        self.sentier_a_change = False
 
 
 
 
     def changement_niveau(self):
-        if (self.niveau_actuel == 2):
-            self.parent.changer_sentier = True
-            self.parent.parent.vue.canevas.delete("tour")
-        else:
-            pass
+        if (self.niveau_actuel > 5):
+            if not self.sentier_a_change:
+                self.parent.changer_sentier = True
+                self.dictionnaire.clear()
+                self.parent.parent.vue.canevas.delete("tour")
+                self.sentier_a_change = True
+            else:
+                pass
 
 
     def creer_niveau(self, evt):
         if len(self.niveau.liste_creep_a_l_ecran) == 0:
             self.niveau_actuel += 1
-            if (self.niveau_actuel > 1):
+            if (self.niveau_actuel > 5):
                 self.parent.sentier_choisi = 1
-                self.dictionnaire.clear()
                 self.changement_niveau()
             self.niveau.fin_niveau = False
             self.total_bombes +=1
@@ -747,7 +750,7 @@ class Creep_vert(Creep):
     def __init__(self, niveau):
         Creep.__init__(self, Creep)
         self.niveau = niveau
-        self.valeur_monetaire_creep = 50
+        self.valeur_monetaire_creep = 45
         self.vitesse_creep = 4
         self.vitesse_creep_X = random.randrange(4) + 2
         self.vitesse_creep_Y = random.randrange(4) + 2
@@ -762,7 +765,7 @@ class Creep_jaune(Creep):
     def __init__(self, niveau):
         Creep.__init__(self, Creep)
         self.niveau = niveau
-        self.valeur_monetaire_creep = 100
+        self.valeur_monetaire_creep = 75
         self.vitesse_creep = 6
         self.vitesse_creep_X = random.randrange(6) + 3
         self.vitesse_creep_Y = random.randrange(6) + 3
@@ -770,17 +773,17 @@ class Creep_jaune(Creep):
         self.valeur_points = 275
         self.couleur = "yellow"
         self.ratio_vie = 10
-        self.vie_creep = 80 + (self.ratio_vie * self.niveau)
+        self.vie_creep = 80 + (self.ratio_vie * self.niveau+15)
 
 
 class Creep_rouge(Creep):
     def __init__(self, niveau):
         Creep.__init__(self, Creep)
         self.niveau = niveau
-        self.valeur_monetaire_creep = 150
+        self.valeur_monetaire_creep = 100
         self.vitesse_creep = 3
-        self.vitesse_creep_X = random.randrange(3) + 1
-        self.vitesse_creep_Y = random.randrange(3) + 1
+        self.vitesse_creep_X = random.randrange(4) + 4
+        self.vitesse_creep_Y = random.randrange(4) + 4
         self.faiblesse_a = True
         self.valeur_points = 325
         self.couleur = "red"
