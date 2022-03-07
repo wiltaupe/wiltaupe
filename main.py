@@ -154,7 +154,7 @@ class Vue():
 
         btn_tour_bleue = Button(frame_bouttons_row1, text="TOUR VERTE 500৳ ", bg="#000", fg="#fff",
                                 font="courier 16 bold")
-        btn_tour_mauve = Button(frame_bouttons_row1, text=" TOUR ROUGE 700৳ ", bg="#000", fg="#fff",
+        btn_tour_mauve = Button(frame_bouttons_row1, text=" TOUR MAUVE 700৳ ", bg="#000", fg="#fff",
                                 font="courier 16 bold")
         btn_tour_blanche = Button(frame_bouttons_row1, text="TOUR BLANCHE 1000৳", bg="#000", fg="#fff",
                                   font="courier 16 bold")
@@ -449,11 +449,12 @@ class Partie():
 
 
     def changement_niveau(self):
-        if (self.niveau_actuel > 5):
+        if (self.niveau_actuel > 1):
             if not self.sentier_a_change:
                 self.parent.changer_sentier = True
                 self.dictionnaire.clear()
                 self.parent.parent.vue.canevas.delete("tour")
+                self.parent.parent.vue.effacer_rayon()
                 self.sentier_a_change = True
             else:
                 pass
@@ -462,7 +463,7 @@ class Partie():
     def creer_niveau(self, evt):
         if len(self.niveau.liste_creep_a_l_ecran) == 0:
             self.niveau_actuel += 1
-            if (self.niveau_actuel > 5):
+            if (self.niveau_actuel > 1):
                 self.parent.sentier_choisi = 1
                 self.changement_niveau()
             self.niveau.fin_niveau = False
@@ -642,11 +643,13 @@ class Niveau():
     def creer_mine(self, evt):
         if self.mine_cliquee:
             if self.parent.total_argent >= self.mine_valeur:
-                self.parent.total_argent -= self.mine_valeur
-                mine_creee = Mine(evt.x, evt.y, self)
-                self.liste_de_mines_a_l_ecran.append(mine_creee)
-                self.parent.couleur_choisie = 0
-                return mine_creee
+                if len(self.liste_de_mines_a_l_ecran) < 6:
+                    self.parent.total_argent -= self.mine_valeur
+                    mine_creee = Mine(evt.x, evt.y, self)
+                    self.liste_de_mines_a_l_ecran.append(mine_creee)
+                    print(self.liste_de_mines_a_l_ecran)
+                    self.parent.couleur_choisie = 0
+                    return mine_creee
 
     def detonation_bombe(self, evt):
         if self.parent.total_argent >= self.bombe_valeur:
