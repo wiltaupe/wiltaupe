@@ -13,7 +13,8 @@ id = 0
 def creer_id():
     global id
     id += 1
-    return id
+    monid = "id : " + str(id)
+    return monid
 
 
 class Vue():
@@ -25,6 +26,7 @@ class Vue():
         self.root.title("TKTD, Vers1.0")
         self.creer_interface()
         self.background = 0
+        self.tour_choix = None
 
     def creer_interface(self):
 
@@ -205,10 +207,12 @@ class Vue():
         btn_tour_bleue.bind("<Button-1>", self.parent.choisir_couleur_bleu)
         btn_tour_mauve.bind("<Button-1>", self.parent.choisir_couleur_mauve)
         btn_tour_blanche.bind("<Button-1>", self.parent.choisir_couleur_blanche)
-        # btn_upgrade_tour.bind("<Button-1>", self.parent.upgrade_tours)
         btn_pause.bind("<Button-1>", self.parent.pause)
         btn_mine.bind("<Button-1>", self.parent.choisir_mine)
         btn_bombe.bind("<Button-1>", self.parent.choisir_bombe)
+        btn_upgrade_range.bind("<Button-1>", self.parent.upgrade_range)
+        btn_upgrade_degats.bind("<Button-1>", self.parent.upgrade_degats)
+        btn_upgrade_special.bind("<Button-1>",self.parent.upgrade_special)
 
         # visualiser
         self.frame_stats.pack(fill=X)
@@ -245,7 +249,7 @@ class Vue():
             self.background += 1
 
         self.canevas.tag_bind("background", "<Button-1>", self.creer_tour)
-        self.canevas.tag_bind("tour", "<Button-3>", self.choisir_tour)
+        self.canevas.tag_bind("tour", "<Button-1>", self.choisir_tour)
         self.canevas.tag_bind("sentier", "<Button-1>", self.placer_mine)
 
         for i in self.modele.sentier[self.parent.modele.sentier_choisi]:
@@ -276,7 +280,7 @@ class Vue():
             if not i.creep_touche:
                 self.canevas.create_oval(i.x - i.rayon, i.y - i.rayon, i.x + i.rayon,
                                          i.y + i.rayon, fill="brown",
-                                         tags="dynamique")
+                                         tags="rayon_tour")
 
     def creer_tour(self, evt):
         couleur_tour = self.parent.modele.partie.couleur_choisie
@@ -302,6 +306,20 @@ class Vue():
                 self.canevas.create_rectangle(evt.x + tour_creee.demitaillex, evt.y + tour_creee.demitailley,
                                               evt.x - tour_creee.demitaillex, evt.y - tour_creee.demitailley,
                                               fill=couleur_tour, tags=("tour", tour_creee.id))
+
+    def choisir_tour(self, evt):
+        pour_upgrade = self.canevas.gettags(CURRENT)
+        self.canevas.delete("rayon_tour")
+        self.tour_choix = self.modele.partie.dictionnaire[(pour_upgrade[1])]
+
+        print(pour_upgrade[0], pour_upgrade[1], "choisie, de rayon : ",
+              self.tour_choix.rayon,
+              "pour la n ième tour:",
+              self.tour_choix.id)
+
+
+        self.tour_choix.afficher_rayon()
+
 
     def placer_mine(self, evt):
         self.parent.modele.partie.niveau.creer_mine(evt)
@@ -330,10 +348,6 @@ class Vue():
             tkinter.messagebox.showinfo( 'Votre survie a échoué ',nice_try,
                                         parent=self.parent.vue.root)
 
-
-    def choisir_tour(self, event):
-        pour_upgrade = self.canevas.gettags(CURRENT)
-        print(pour_upgrade[1])
 
 
 class Modele():
@@ -391,9 +405,6 @@ class Modele():
         self.partie.meilleur_score = int(matches[0])
         return self.partie.meilleur_score
 
-    # def upgrade_tours(self, evt):
-    #     self.partie.upgrade_tours(evt)
-
 
 class Partie():
     def __init__(self, parent):
@@ -413,6 +424,7 @@ class Partie():
         self.cout_upgrade = 300
         self.ratio_upgrade = 1
         self.meilleur_score = 55
+
 
     def creer_niveau(self, evt):
         if len(self.niveau.liste_creep_a_l_ecran) == 0:
@@ -442,21 +454,23 @@ class Partie():
         self.couleur_choisie = 3
 
     def creer_tour(self, evt, couleur_tour):
-        id = creer_id()
         tour_creee = None
         if self.total_argent > 100:
             if couleur_tour == 1:
                 if self.total_argent >= self.niveau.tour_bleue_valeur:
+                    id = creer_id()
                     self.total_argent -= self.niveau.tour_bleue_valeur
                     tour_creee = Tour_Bleu(self, evt.x, evt.y, id)
 
             if couleur_tour == 2:
                 if self.total_argent >= self.niveau.tour_mauve_valeur:
+                    id = creer_id()
                     self.total_argent -= self.niveau.tour_mauve_valeur
                     tour_creee = Tour_Mauve(self, evt.x, evt.y, id)
 
             if couleur_tour == 3:
                 if self.total_argent >= self.niveau.tour_blanche_valeur:
+                    id = creer_id()
                     self.total_argent -= self.niveau.tour_blanche_valeur
                     tour_creee = Tour_Blanche(self, evt.x, evt.y, id)
 
@@ -491,9 +505,9 @@ class Niveau():
         self.mine_valeur = 100
         self.bombe_valeur = 100
         self.valeur_degat = 0.5
-
         self.creer_creeps()
         self.pour_shotgun = None
+
 
     def jouer_tour(self):
 
@@ -766,6 +780,7 @@ class Tour():
         self.cooldown = 0
         self.cooldown_tower = 0
         self.placement_valide = False
+        self.rayon_visible = False
 
     def verification_range(self):
         liste = self.parent.parent.partie.niveau.liste_creep_a_l_ecran
@@ -785,15 +800,32 @@ class Tour():
         if isinstance(self, Tour_Bleu):
             self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_a(self.position_x_tour, self.position_y_tour, creep_cible))
         if isinstance(self, Tour_Mauve):
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(50), self.position_y_tour + random.randrange(50),creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(30), self.position_y_tour + random.randrange(30),creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(10), self.position_y_tour + random.randrange(10),creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(10), self.position_y_tour - random.randrange(10),creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(30), self.position_y_tour - random.randrange(30),creep_cible))
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour - random.randrange(50), self.position_y_tour - random.randrange(50),creep_cible))
+            for j in range(self.nb_projectile):
+                self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(50), self.position_y_tour + random.randrange(50),creep_cible))
         if isinstance(self, Tour_Blanche):
             self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
                 Projectil_c(self.position_x_tour, self.position_y_tour, creep_cible))
+
+    def afficher_rayon(self):
+        self.rayon_visible = not self.rayon_visible
+
+    def up_degats(self):
+        self.parent.projectile.degats += 5
+
+    def up_range(self):
+        self.rayon *= 1.1
+        self.parent.total_sagesse -= 300
+
+    def up_special(self):
+        if isinstance(self,Tour_Bleu):
+            self.parent.projectile.vitesse_projectile += 3
+
+        if isinstance(self,Tour_Mauve):
+            self.nb_projectile += 1
+
+        if isinstance(self,Tour_Blanche):
+            self.rebound_tour += 1
+            Projectil_c.ajouter_rebound()
 
 
 class Tour_Bleu(Tour):
@@ -809,6 +841,7 @@ class Tour_Bleu(Tour):
 class Tour_Mauve(Tour):
     def __init__(self, parent, x, y, id):
         Tour.__init__(self, parent, x, y)
+        self.nb_projectile = 6
         self.valeur_monnetaire_tour = 700
         self.couleur_tour = 2
         self.rayon = 200
@@ -868,6 +901,7 @@ class Projectil_a(Projectile):
                 self.creep_cible.vie_creep -= self.degats
 
 
+
 class Projectil_b(Projectile):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
         Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
@@ -924,6 +958,69 @@ class Projectil_b(Projectile):
                     i.vie_creep -= self.degats
                     i.creep_touche = False
 
+    # def projectile_shotgun(self, listedecreep, tour, parent):
+    #
+    #     if not self.deja_vise:
+    #         self.position_vise_x = self.creep_cible.x1
+    #         self.position_vise_y = self.creep_cible.y1
+    #         self.deja_vise = True
+    #         self.position_ini_x = self.position_projectile_x
+    #         self.position_ini_y = self.position_projectile_y
+    #
+    #     if self.position_ini_x <= self.position_vise_x:  # de g à dr
+    #         if self.position_projectile_y > self.position_vise_y:  # de b en h
+    #             self.position_projectile_x += self.vitesse_projectile
+    #             self.position_projectile_y -= self.vitesse_projectile
+    #             if (
+    #                     (self.position_projectile_x > self.parent.parent.largeur)
+    #                     or (self.position_projectile_y < 0)
+    #                     or (self.position_projectile_x > self.position_vise_x)
+    #                     or (self.position_projectile_y < self.position_vise_y)
+    #             ):
+    #                 self.out_of_bound = True
+    #         else:  # de h en b
+    #             self.position_projectile_x += self.vitesse_projectile
+    #             self.position_projectile_y += self.vitesse_projectile
+    #             if (
+    #                     (self.position_projectile_x > self.parent.parent.largeur)
+    #                     or (self.position_projectile_y > self.parent.parent.hauteur)
+    #                     or (self.position_projectile_x > self.position_vise_x)
+    #                     or (self.position_projectile_y > self.position_vise_y)
+    #             ):
+    #                 self.out_of_bound = True
+    #     if self.position_ini_x > self.position_vise_x:  # de dr à g
+    #         if self.position_projectile_y > self.position_vise_y:  # de b en h
+    #             self.position_projectile_x -= self.vitesse_projectile
+    #             self.position_projectile_y -= self.vitesse_projectile
+    #             if (
+    #                     (self.position_projectile_x < 0)
+    #                     or (self.position_projectile_y < 0)
+    #                     or (self.position_projectile_x < self.position_vise_x)
+    #                     or (self.position_projectile_y < self.position_vise_y)
+    #             ):
+    #                 self.out_of_bound = True
+    #         else:  # de h en b
+    #             self.position_projectile_x -= self.vitesse_projectile
+    #             self.position_projectile_y += self.vitesse_projectile
+    #             if (
+    #                     (self.position_projectile_x < 0)
+    #                     or (self.position_projectile_y > self.parent.parent.hauteur)
+    #                     or (self.position_projectile_x < self.position_vise_x)
+    #                     or (self.position_projectile_y > self.position_vise_y)
+    #             ):
+    #                 self.out_of_bound = True
+    #
+    #     for i in listedecreep:
+    #         distance_projectile_verification = Helper.calcDistance(self.position_projectile_x,
+    #                                                                self.position_projectile_y, i.x1, i.y1)
+    #         if distance_projectile_verification < i.rayon:
+    #             i.creep_touche = True
+    #             self.creep_touche = True
+    #         if i.creep_touche:
+    #             if i.vie_creep > 0:
+    #                 i.vie_creep -= self.degats
+    #                 i.creep_touche = False
+
 
 class Projectil_c(Projectile):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
@@ -965,6 +1062,8 @@ class Projectil_c(Projectile):
                 if self.cible == self.rebound:
                     self.creep_touche = True
 
+    def ajouter_rebound(self):
+        self.rebound += 1
 
 class Mine():
     def __init__(self, position_mine_x, position_mine_y, niveau):
@@ -1051,7 +1150,19 @@ class Controleur():
     def creer_niveau(self, evt):
         self.modele.partie.creer_niveau(evt)
 
+    def upgrade_range(self, evt):
+        monchoix = self.vue.tour_choix
+        monchoix.up_range()
 
+    def upgrade_degats(self, evt):
+        monchoix = self.vue.tour_choix
+        print(monchoix)
+        monchoix.up_degats()
+
+    def upgrade_special(self, evt):
+        monchoix = self.vue.tour_choix
+        print(monchoix)
+        monchoix.up_special()
 
 if __name__ == '__main__':
     c = Controleur()
