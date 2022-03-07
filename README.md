@@ -44,13 +44,17 @@ Le bouton AMÉLIORER DÉGATS augmente le dommage causé par la tour sélectionn�
 
 Le bouton AMÉLIORER SPÉCIAL améliore le type de tir de la tour améliorée (500௹):
   - Une tour Verte augmentera sa cadence de tir;
-  - Une tour Rouge augmentera le nombre de ses projectils;
+  - Une tour Mauve augmentera le nombre de ses projectils;
   - Une tour Blanche rebondira plus de fois.
+
+Les virus se déplacent à une vitesse aléatoire, rendant le jeu imprévisible.
+
+Si un niveau est complété sans qu'aucun ennemi se rende au CPU, un bonus est octroyé.
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # ♦ BUGS CONNUS ♦
-
+  
   
  
 
