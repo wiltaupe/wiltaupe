@@ -781,6 +781,9 @@ class Tour():
         self.cooldown_tower = 0
         self.placement_valide = False
         self.rayon_visible = False
+        self.degats_tour = 0
+        self.rebound_tour = 0
+        self.vitesse_projectile_tour = 0
 
     def verification_range(self):
         liste = self.parent.parent.partie.niveau.liste_creep_a_l_ecran
@@ -798,35 +801,38 @@ class Tour():
 
     def tirer_creep(self, creep_cible):
         if isinstance(self, Tour_Bleu):
-            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_a(self.position_x_tour, self.position_y_tour, creep_cible))
+            self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_a(self.position_x_tour, self.position_y_tour, creep_cible,self))
         if isinstance(self, Tour_Mauve):
             for j in range(self.nb_projectile):
-                self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(50), self.position_y_tour + random.randrange(50),creep_cible))
+                self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(Projectil_b(self.position_x_tour + random.randrange(50), self.position_y_tour + random.randrange(50),creep_cible,self))
         if isinstance(self, Tour_Blanche):
             self.parent.parent.partie.niveau.liste_de_projectile_a_l_ecran.append(
-                Projectil_c(self.position_x_tour, self.position_y_tour, creep_cible))
+                Projectil_c(self.position_x_tour, self.position_y_tour, creep_cible,self))
 
     def afficher_rayon(self):
         self.rayon_visible = not self.rayon_visible
 
     def up_degats(self):
-        self.parent.projectile.degats += 5
+        if self.parent.total_sagesse >= 300:
+            self.parent.projectile.degats += 5
+            self.parent.total_sagesse -= 300
 
     def up_range(self):
-        self.rayon *= 1.1
-        self.parent.total_sagesse -= 300
+        if self.parent.total_sagesse >= 300:
+            self.rayon *= 1.1
+            self.parent.total_sagesse -= 300
 
     def up_special(self):
-        if isinstance(self,Tour_Bleu):
-            self.parent.projectile.vitesse_projectile += 3
+        if self.parent.total_sagesse >= 500:
+            self.parent.total_sagesse -= 500
+            if isinstance(self,Tour_Bleu):
+                self.vitesse_projectile_tour += 3
 
-        if isinstance(self,Tour_Mauve):
-            self.nb_projectile += 1
+            if isinstance(self,Tour_Mauve):
+                self.nb_projectile += 1
 
-        if isinstance(self,Tour_Blanche):
-            self.rebound_tour += 1
-            Projectil_c.ajouter_rebound()
-
+            if isinstance(self,Tour_Blanche):
+                self.rebound_tour += 1
 
 class Tour_Bleu(Tour):
     def __init__(self, parent, x, y, id):
@@ -836,6 +842,8 @@ class Tour_Bleu(Tour):
         self.cooldown_tower = 20
         self.rayon = 150
         self.id = id
+        self.degats_tour = 30
+        self.vitesse_projectile_tour = 6
 
 
 class Tour_Mauve(Tour):
@@ -847,6 +855,8 @@ class Tour_Mauve(Tour):
         self.rayon = 200
         self.cooldown_tower = 30
         self.id = id
+        self.degats_tour = 10
+        self.vitesse_projectile_tour = 5
 
 
 class Tour_Blanche(Tour):
@@ -857,15 +867,17 @@ class Tour_Blanche(Tour):
         self.rayon = 500
         self.cooldown_tower = 40
         self.id = id
+        self.degats_tour = 10
+        self.rebound_tour = 3
+        self.vitesse_projectile_tour = 20
 
 
-class Projectile(Partie):
-    def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
-        self.parent = Partie
+class Projectile():
+    def __init__(self, position_projectile_x, position_projectile_y, creep_cible,tour_de_choix):
+        self.tour = Tour
         self.position_projectile_x = position_projectile_x
         self.position_projectile_y = position_projectile_y
         self.degats = 0
-        self.vitesse_projectile = 0
         self.rayon = 10
         self.creep_touche = False
         self.creep_cible = creep_cible
@@ -873,23 +885,22 @@ class Projectile(Partie):
         self.unefois = 0
         self.out_of_bound = False
         self.cible = 0
-        self.rebound = 0
+        self.tour = tour_de_choix
 
 
 class Projectil_a(Projectile):
-    def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
-        Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
+    def __init__(self, position_projectile_x, position_projectile_y, creep_cible,tour_de_choix):
+        Projectile.__init__(self, position_projectile_x, position_projectile_y,creep_cible,tour_de_choix)
         self.couleur_projectile = 1
-        self.degats = 30
-        self.vitesse_projectile = 6
 
     def projectile_a_tete_chercheuse(self):
         distance_projectile = Helper.calcDistance(self.position_projectile_x, self.position_projectile_y,
                                                   self.creep_cible.x1, self.creep_cible.y1)
         angle_projectile = Helper.calcAngle(self.position_projectile_x, self.position_projectile_y, self.creep_cible.x1,
                                             self.creep_cible.y1)
-        cible_projectile = Helper.getAngledPoint(angle_projectile, self.vitesse_projectile, self.position_projectile_x,
+        cible_projectile = Helper.getAngledPoint(angle_projectile, self.tour.vitesse_projectile_tour, self.position_projectile_x,
                                                  self.position_projectile_y)
+
 
         self.position_projectile_x = cible_projectile[0]
         self.position_projectile_y = cible_projectile[1]
@@ -898,17 +909,15 @@ class Projectil_a(Projectile):
             self.creep_touche = True
         if self.creep_touche:
             if self.creep_cible.vie_creep > 0:
-                self.creep_cible.vie_creep -= self.degats
+                self.creep_cible.vie_creep -= self.tour.degats_tour
 
 
 
 class Projectil_b(Projectile):
-    def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
-        Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
+    def __init__(self, position_projectile_x, position_projectile_y, creep_cible,tour_de_choix):
+        Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible,tour_de_choix)
         self.couleur_projectile = 2
-        self.degats = 10
         self.rayon = 5
-        self.vitesse_projectile = 5
         self.position_vise_x = 0
         self.position_vise_y = 0
         self.position_ini_x = 0
@@ -925,25 +934,25 @@ class Projectil_b(Projectile):
 
         if self.position_ini_x < self.position_vise_x:
             if self.position_projectile_x < self.position_vise_x * 100:
-                self.position_projectile_x += self.vitesse_projectile
+                self.position_projectile_x += self.tour.vitesse_projectile_tour
                 if self.position_projectile_x > self.position_ini_x + tour.rayon - 50:
                     self.out_of_bound = True
 
         if self.position_ini_x > self.position_vise_x:
             if self.position_projectile_x > self.position_vise_x / 100:
-                self.position_projectile_x -= self.vitesse_projectile
+                self.position_projectile_x -= self.tour.vitesse_projectile_tour
                 if self.position_projectile_x < self.position_ini_x - tour.rayon + 50:
                     self.out_of_bound = True
 
         if self.position_ini_y < self.position_vise_y:
             if self.position_projectile_y < self.position_vise_y * 100:
-                self.position_projectile_y += self.vitesse_projectile
+                self.position_projectile_y += self.tour.vitesse_projectile_tour
                 if self.position_projectile_y > self.position_ini_y + tour.rayon - 50:
                     self.out_of_bound = True
 
         if self.position_ini_y > self.position_vise_y:
             if self.position_projectile_y > self.position_vise_y / 100:
-                self.position_projectile_y -= self.vitesse_projectile
+                self.position_projectile_y -= self.tour.vitesse_projectile_tour
                 if self.position_projectile_y < self.position_ini_y - tour.rayon + 50:
                     self.out_of_bound = True
 
@@ -955,7 +964,7 @@ class Projectil_b(Projectile):
                 self.creep_touche = True
             if i.creep_touche:
                 if i.vie_creep > 0:
-                    i.vie_creep -= self.degats
+                    i.vie_creep -= self.tour.degats_tour
                     i.creep_touche = False
 
     # def projectile_shotgun(self, listedecreep, tour, parent):
@@ -1023,20 +1032,18 @@ class Projectil_b(Projectile):
 
 
 class Projectil_c(Projectile):
-    def __init__(self, position_projectile_x, position_projectile_y, creep_cible):
-        Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible)
+    def __init__(self, position_projectile_x, position_projectile_y, creep_cible,tour_de_choix):
+        Projectile.__init__(self, position_projectile_x, position_projectile_y, creep_cible,tour_de_choix)
         self.couleur_projectile = 3
-        self.degats = 10
-        self.vitesse_projectile = 20
         self.rayon = 5
         self.cible = 0
-        self.rebound = 3
+        self.rebound = self.tour.rebound_tour
 
     def projectile_rebound(self, liste_de_creep):
         if self.cible < len(liste_de_creep):
             distance_projectile = Helper.calcDistance(self.position_projectile_x, self.position_projectile_y,liste_de_creep[self.cible].x1, liste_de_creep[self.cible].y1)
             angle_projectile = Helper.calcAngle(self.position_projectile_x, self.position_projectile_y,liste_de_creep[self.cible].x1, liste_de_creep[self.cible].y1)
-            cible_projectile = Helper.getAngledPoint(angle_projectile, self.vitesse_projectile,self.position_projectile_x, self.position_projectile_y)
+            cible_projectile = Helper.getAngledPoint(angle_projectile, self.tour.vitesse_projectile_tour,self.position_projectile_x, self.position_projectile_y)
 
             self.position_projectile_x = cible_projectile[0]
             self.position_projectile_y = cible_projectile[1]
@@ -1046,7 +1053,7 @@ class Projectil_c(Projectile):
 
             if liste_de_creep[self.cible].creep_touche:
                 if liste_de_creep[self.cible].vie_creep > 0:
-                    liste_de_creep[self.cible].vie_creep -= self.degats
+                    liste_de_creep[self.cible].vie_creep -= self.tour.degats_tour
                     liste_de_creep[self.cible].creep_touche = False
 
                 if liste_de_creep[self.cible].vie_creep < 0:
@@ -1117,7 +1124,6 @@ class Controleur():
             if not self.pause_en_cours:
                 self.modele.jouer_tour()
                 self.vue.afficher_partie()
-                #print(self.vue.canevas.find_all())
                 self.vue.root.after(40, self.jouer_partie)
         else:
             self.vue.fin_partie()
@@ -1156,12 +1162,10 @@ class Controleur():
 
     def upgrade_degats(self, evt):
         monchoix = self.vue.tour_choix
-        print(monchoix)
         monchoix.up_degats()
 
     def upgrade_special(self, evt):
         monchoix = self.vue.tour_choix
-        print(monchoix)
         monchoix.up_special()
 
 if __name__ == '__main__':
