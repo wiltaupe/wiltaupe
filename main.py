@@ -68,7 +68,7 @@ class Vue():
         label_score_text = Label(frame_stats2, text="Vie:", textvariable=self.score, bg="#000000",
                                  borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
 
-        label_vie_text = Label(frame_stats3, text="Vie:", bg="#000000", borderwidth=3,
+        label_vie_text = Label(frame_stats3, text="État du système:", bg="#000000", borderwidth=3,
                                relief="sunken", font="Courier 16 bold", fg="#FFF")
         label_vie = Label(frame_stats3, text="Vie:", textvariable=self.points_vie, bg="#000000",
                           borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
@@ -79,7 +79,7 @@ class Vue():
                                    bg="#000000", borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
         label_argent = Label(frame_stats5, text="Argent(৳):", bg="#000000", borderwidth=3,
                              relief="sunken", fg="#FFF", font="Courier 16 bold")
-        label_argent_text = Label(frame_stats5, text="Vie:", textvariable=self.argent, bg="#000000",
+        label_argent_text = Label(frame_stats5, text="", textvariable=self.argent, bg="#000000",
                                   borderwidth=3, relief="sunken", font="Courier 24 bold", fg="#FFF")
 
 
@@ -127,11 +127,11 @@ class Vue():
                              relief="sunken", font="Courier 16 bold", fg="#FFF")
         label_niveau_texte = Label(frame_infos_partie1, textvariable=self.niveau, bg="#000000", borderwidth=3,
                                    relief="sunken", font="Courier 16 bold", fg="#FFF")
-        label_bombes = Label(frame_infos_partie2, text="Bombes:", bg="#000000", borderwidth=3,
+        label_bombes = Label(frame_infos_partie2, text="Scans:", bg="#000000", borderwidth=3,
                              relief="sunken", font="Courier 16 bold", fg="#FFF")
         label_bombes_texte = Label(frame_infos_partie2, textvariable=self.bombes, bg="#000000", borderwidth=3,
                                    relief="sunken", font="Courier 16 bold", fg="#FFF")
-        label_creeps_tues = Label(frame_infos_partie3, text="Creeps tués:", bg="#000000", borderwidth=3,
+        label_creeps_tues = Label(frame_infos_partie3, text="Virus tués:", bg="#000000", borderwidth=3,
                                   relief="sunken", font="Courier 16 bold", fg="#FFF")
         label_creeps_tues_texte = Label(frame_infos_partie3, textvariable=self.nbcreepstues, bg="#000000",
                                         borderwidth=3,
@@ -169,7 +169,7 @@ class Vue():
                                     fg="#FFF")
 
         btn_mine = Button(frame_bouttons_row3, text="PLACER MINE 100৳", bg="#000", fg="#fff", font="courier 16 bold")
-        btn_bombe = Button(frame_bouttons_row3, text="BOMBA 1000৳", bg="#000", fg="#fff", font="courier 16 bold")
+        btn_bombe = Button(frame_bouttons_row3, text="SCAN 1000৳", bg="#000", fg="#fff", font="courier 16 bold")
 
         btn_upgrade_range = Button(frame_bouttons_row4, text="AMÉLIORER RANGE 300௹", bg="#000",
                                   fg="#fff", font="courier 16 bold", )
@@ -282,6 +282,11 @@ class Vue():
                                          i.y + i.rayon, fill="brown",
                                          tags="rayon_tour")
 
+    def effacer_sentier(self):
+
+        self.canevas.delete("tour")
+
+
     def creer_tour(self, evt):
         couleur_tour = self.parent.modele.partie.couleur_choisie
         tour_creee = self.parent.creer_tour(evt, couleur_tour)
@@ -350,6 +355,8 @@ class Vue():
 
 
 
+
+
 class Modele():
     def __init__(self, parent):
         self.parent = parent
@@ -412,8 +419,8 @@ class Partie():
         self.total_creep_tues = 0
         self.total_points = 0
         self.total_vie = 100
-        self.total_argent = 1000
-        self.total_sagesse = 6000
+        self.total_argent = 100000
+        self.total_sagesse = 600000
         self.niveau_actuel = 1
         self.niveau = Niveau(self, self.niveau_actuel)
         self.creeps_tues = 0
@@ -426,9 +433,23 @@ class Partie():
         self.meilleur_score = 55
 
 
+
+
+    def changement_niveau(self):
+        if (self.niveau_actuel == 2):
+            self.parent.changer_sentier = True
+            self.parent.parent.vue.canevas.delete("tour")
+        else:
+            pass
+
+
     def creer_niveau(self, evt):
         if len(self.niveau.liste_creep_a_l_ecran) == 0:
             self.niveau_actuel += 1
+            if (self.niveau_actuel > 1):
+                self.parent.sentier_choisi = 1
+                self.dictionnaire.clear()
+                self.changement_niveau()
             self.niveau.fin_niveau = False
             self.total_bombes +=1
             self.niveau.creer_creeps()
@@ -570,17 +591,20 @@ class Niveau():
                         self.liste_de_projectile_a_l_ecran.remove(k)
 
     def creer_creeps(self):
+        print(self.niveau_actuel)
         if self.ratio_creep_vert > 0:
             for i in range(int(self.ratio_creep * self.ratio_creep_vert)):
-                self.liste_creep_attente.append(Creep_vert())
+                self.liste_creep_attente.append(Creep_vert(self.parent.niveau_actuel))
+
+
 
         for i in range(int(self.ratio_creep * self.ratio_creep_jaune)):
-            self.liste_creep_attente.append(Creep_jaune())
+            self.liste_creep_attente.append(Creep_jaune(self.parent.niveau_actuel))
 
         for i in range(int(self.ratio_creep * self.ratio_creep_rouge)):
-            self.liste_creep_attente.append(Creep_rouge())
+            self.liste_creep_attente.append(Creep_rouge(self.parent.niveau_actuel))
 
-        self.liste_creep_attente.append(Boss())
+        self.liste_creep_attente.append(Boss(self.parent.niveau_actuel))
 
         self.ratio_creep_vert -= 0.05
         self.ratio_creep_jaune += 0.1
@@ -594,6 +618,7 @@ class Niveau():
         if len(self.liste_creep_attente) >= 0:
             tmp = self.liste_creep_attente.pop(0)
             self.liste_creep_a_l_ecran.append(tmp)
+
 
     def cliquer_mine(self, evt):
         self.mine_cliquee = True
@@ -640,6 +665,7 @@ class Creep():
         self.faiblesse_a = False
         self.faiblesse_b = False
         self.faiblesse_c = False
+
 
 
     def jouer_tour(self, parent):
@@ -718,52 +744,60 @@ class Creep():
 
 
 class Creep_vert(Creep):
-    def __init__(self):
+    def __init__(self, niveau):
         Creep.__init__(self, Creep)
-        self.vie_creep = 60
+        self.niveau = niveau
         self.valeur_monetaire_creep = 50
         self.vitesse_creep = 4
         self.vitesse_creep_X = random.randrange(4) + 2
         self.vitesse_creep_Y = random.randrange(4) + 2
         self.faiblesse_c = True
-        self.valeur_points = 100
+        self.valeur_points = 110
         self.couleur = "orange"
+        self.ratio_vie = 10
+        self.vie_creep = 50 + (self.ratio_vie * self.niveau)
 
 
 class Creep_jaune(Creep):
-    def __init__(self):
+    def __init__(self, niveau):
         Creep.__init__(self, Creep)
-        self.vie_creep = 90
+        self.niveau = niveau
         self.valeur_monetaire_creep = 100
         self.vitesse_creep = 6
         self.vitesse_creep_X = random.randrange(6) + 3
         self.vitesse_creep_Y = random.randrange(6) + 3
         self.faiblesse_a = True
-        self.valeur_points = 200
+        self.valeur_points = 275
         self.couleur = "yellow"
+        self.ratio_vie = 10
+        self.vie_creep = 80 + (self.ratio_vie * self.niveau)
 
 
 class Creep_rouge(Creep):
-    def __init__(self):
+    def __init__(self, niveau):
         Creep.__init__(self, Creep)
-        self.vie_creep = 150
+        self.niveau = niveau
         self.valeur_monetaire_creep = 150
         self.vitesse_creep = 3
         self.vitesse_creep_X = random.randrange(3) + 1
         self.vitesse_creep_Y = random.randrange(3) + 1
         self.faiblesse_a = True
-        self.valeur_points = 300
+        self.valeur_points = 325
         self.couleur = "red"
+        self.ratio_vie = 10
+        self.vie_creep = 140 + (self.ratio_vie * self.niveau)
 
 
 class Boss(Creep):
-    def __init__(self):
+    def __init__(self, niveau):
         Creep.__init__(self, Creep)
-        self.vie_creep = 450
+        self.niveau = niveau
         self.valeur_monetaire_creep = 300
         self.rayon = 15
         self.couleur = "pink"
         self.valeur_points = 500
+        self.ratio_vie = 5
+        self.vie_creep = 280 + (self.ratio_vie * self.niveau)
 
 
 class Tour():
@@ -814,7 +848,7 @@ class Tour():
 
     def up_degats(self):
         if self.parent.total_sagesse >= 300:
-            self.parent.projectile.degats += 5
+            self.degats_tour += 5
             self.parent.total_sagesse -= 300
 
     def up_range(self):
@@ -910,6 +944,10 @@ class Projectil_a(Projectile):
         if self.creep_touche:
             if self.creep_cible.vie_creep > 0:
                 self.creep_cible.vie_creep -= self.tour.degats_tour
+
+    def changement_sentier(self):
+        self.vue.effacer_sentier()
+
 
 
 
@@ -1083,6 +1121,7 @@ class Mine():
         self.liste_creep_sur_mine = []
         # self.couleur_mine = "brown"
 
+
     def detonation_mine(self, liste_creep):
         print("boom\n\n")
         self.creep_touche = True
@@ -1099,7 +1138,9 @@ class Controleur():
         self.modele = Modele(self)
         self.vue = Vue(self)
         self.pause_en_cours = 0
+        self.changer_sentier = False
         self.vue.root.mainloop()
+
 
     def pause(self, evt):
         if not self.pause_en_cours:
@@ -1122,6 +1163,9 @@ class Controleur():
     def jouer_partie(self):
         if self.partie_en_cours:
             if not self.pause_en_cours:
+                if self.changer_sentier:
+                    self.changement_sentier()
+                    self.changer_sentier = False
                 self.modele.jouer_tour()
                 self.vue.afficher_partie()
                 self.vue.root.after(40, self.jouer_partie)
