@@ -280,21 +280,21 @@ class Vue():
             if not i.creep_touche:
                 self.canevas.create_oval(i.x - i.rayon, i.y - i.rayon, i.x + i.rayon,
                                          i.y + i.rayon, fill="brown",
-                                         tags="rayon_tour")
+                                         tags="dynamique")
 
     def effacer_sentier(self):
-
         self.canevas.delete("tour")
 
 
     def creer_tour(self, evt):
+        self.effacer_rayon()
         couleur_tour = self.parent.modele.partie.couleur_choisie
         tour_creee = self.parent.creer_tour(evt, couleur_tour)
         if tour_creee is not None:
             if couleur_tour != 0:
                 self.canevas.create_oval(evt.x - tour_creee.rayon, evt.y - tour_creee.rayon,
                                          evt.x + tour_creee.rayon, evt.y + tour_creee.rayon,
-                                         fill=None, tags=("statique"))
+                                         fill=None,width=3,outline="white", tags=("rayon_tour"))
 
         # TOUR BLEUE = VERT
         # TOUR MAUVE = ROUGE
@@ -322,12 +322,24 @@ class Vue():
               "pour la n ième tour:",
               self.tour_choix.id)
 
-
         self.tour_choix.afficher_rayon()
+        self.mise_ajour_rayon(evt)
+
+    def mise_ajour_rayon(self, evt):
+        if self.tour_choix.rayon_visible is True:
+            self.canevas.create_oval(evt.x - self.tour_choix.rayon, evt.y - self.tour_choix.rayon,
+                                     evt.x + self.tour_choix.rayon, evt.y + self.tour_choix.rayon,
+                                     fill=None, width=3,outline="white", tags=("rayon_tour"))
+            self.tour_choix.rayon_visible = False
+
+    def effacer_rayon(self):
+        self.canevas.delete("rayon_tour")
 
 
     def placer_mine(self, evt):
+        self.effacer_rayon()
         self.parent.modele.partie.niveau.creer_mine(evt)
+
 
     def fin_partie(self):
         self.canevas.delete("statique")
@@ -531,6 +543,7 @@ class Niveau():
         self.valeur_degat = 0.5
         self.creer_creeps()
         self.pour_shotgun = None
+        self.mine_cliquee = False
 
 
     def jouer_tour(self):
@@ -847,7 +860,7 @@ class Tour():
                 Projectil_c(self.position_x_tour, self.position_y_tour, creep_cible,self))
 
     def afficher_rayon(self):
-        self.rayon_visible = not self.rayon_visible
+        self.rayon_visible = True
 
     def up_degats(self):
         if self.parent.total_sagesse >= 300:
@@ -861,15 +874,18 @@ class Tour():
 
     def up_special(self):
         if self.parent.total_sagesse >= 500:
-            self.parent.total_sagesse -= 500
             if isinstance(self,Tour_Bleu):
-                self.vitesse_projectile_tour += 3
+                if self.vitesse_projectile_tour < 30:
+                    self.vitesse_projectile_tour += 3
+                    self.parent.total_sagesse -= 500
 
             if isinstance(self,Tour_Mauve):
                 self.nb_projectile += 1
+                self.parent.total_sagesse -= 500
 
             if isinstance(self,Tour_Blanche):
                 self.rebound_tour += 1
+                self.parent.total_sagesse -= 500
 
 class Tour_Bleu(Tour):
     def __init__(self, parent, x, y, id):
@@ -1007,70 +1023,6 @@ class Projectil_b(Projectile):
                 if i.vie_creep > 0:
                     i.vie_creep -= self.tour.degats_tour
                     i.creep_touche = False
-
-    # def projectile_shotgun(self, listedecreep, tour, parent):
-    #
-    #     if not self.deja_vise:
-    #         self.position_vise_x = self.creep_cible.x1
-    #         self.position_vise_y = self.creep_cible.y1
-    #         self.deja_vise = True
-    #         self.position_ini_x = self.position_projectile_x
-    #         self.position_ini_y = self.position_projectile_y
-    #
-    #     if self.position_ini_x <= self.position_vise_x:  # de g à dr
-    #         if self.position_projectile_y > self.position_vise_y:  # de b en h
-    #             self.position_projectile_x += self.vitesse_projectile
-    #             self.position_projectile_y -= self.vitesse_projectile
-    #             if (
-    #                     (self.position_projectile_x > self.parent.parent.largeur)
-    #                     or (self.position_projectile_y < 0)
-    #                     or (self.position_projectile_x > self.position_vise_x)
-    #                     or (self.position_projectile_y < self.position_vise_y)
-    #             ):
-    #                 self.out_of_bound = True
-    #         else:  # de h en b
-    #             self.position_projectile_x += self.vitesse_projectile
-    #             self.position_projectile_y += self.vitesse_projectile
-    #             if (
-    #                     (self.position_projectile_x > self.parent.parent.largeur)
-    #                     or (self.position_projectile_y > self.parent.parent.hauteur)
-    #                     or (self.position_projectile_x > self.position_vise_x)
-    #                     or (self.position_projectile_y > self.position_vise_y)
-    #             ):
-    #                 self.out_of_bound = True
-    #     if self.position_ini_x > self.position_vise_x:  # de dr à g
-    #         if self.position_projectile_y > self.position_vise_y:  # de b en h
-    #             self.position_projectile_x -= self.vitesse_projectile
-    #             self.position_projectile_y -= self.vitesse_projectile
-    #             if (
-    #                     (self.position_projectile_x < 0)
-    #                     or (self.position_projectile_y < 0)
-    #                     or (self.position_projectile_x < self.position_vise_x)
-    #                     or (self.position_projectile_y < self.position_vise_y)
-    #             ):
-    #                 self.out_of_bound = True
-    #         else:  # de h en b
-    #             self.position_projectile_x -= self.vitesse_projectile
-    #             self.position_projectile_y += self.vitesse_projectile
-    #             if (
-    #                     (self.position_projectile_x < 0)
-    #                     or (self.position_projectile_y > self.parent.parent.hauteur)
-    #                     or (self.position_projectile_x < self.position_vise_x)
-    #                     or (self.position_projectile_y > self.position_vise_y)
-    #             ):
-    #                 self.out_of_bound = True
-    #
-    #     for i in listedecreep:
-    #         distance_projectile_verification = Helper.calcDistance(self.position_projectile_x,
-    #                                                                self.position_projectile_y, i.x1, i.y1)
-    #         if distance_projectile_verification < i.rayon:
-    #             i.creep_touche = True
-    #             self.creep_touche = True
-    #         if i.creep_touche:
-    #             if i.vie_creep > 0:
-    #                 i.vie_creep -= self.degats
-    #                 i.creep_touche = False
-
 
 class Projectil_c(Projectile):
     def __init__(self, position_projectile_x, position_projectile_y, creep_cible,tour_de_choix):
