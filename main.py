@@ -244,6 +244,7 @@ class Vue():
         self.canevas.delete("projectile")
         self.canevas.delete("statique")
 
+
         if self.background == 0:
             # self.canevas.create_rectangle(0, 600, 1200, 0, fill="#FFFFFF", tags="background")
             self.background += 1
@@ -321,14 +322,13 @@ class Vue():
               self.tour_choix.rayon,
               "pour la n ième tour:",
               self.tour_choix.id)
-
         self.tour_choix.afficher_rayon()
-        self.mise_ajour_rayon(evt)
+        self.mise_ajour_rayon(self.tour_choix)
 
     def mise_ajour_rayon(self, evt):
         if self.tour_choix.rayon_visible is True:
-            self.canevas.create_oval(evt.x - self.tour_choix.rayon, evt.y - self.tour_choix.rayon,
-                                     evt.x + self.tour_choix.rayon, evt.y + self.tour_choix.rayon,
+            self.canevas.create_oval(self.tour_choix.position_x_tour - self.tour_choix.rayon, self.tour_choix.position_y_tour - self.tour_choix.rayon,
+                                     self.tour_choix.position_x_tour + self.tour_choix.rayon, self.tour_choix.position_y_tour + self.tour_choix.rayon,
                                      fill=None, width=3,outline="white", tags=("rayon_tour"))
             self.tour_choix.rayon_visible = False
 
@@ -449,7 +449,7 @@ class Partie():
 
 
     def changement_niveau(self):
-        if (self.niveau_actuel > 1):
+        if (self.niveau_actuel > 4):
             if not self.sentier_a_change:
                 self.parent.changer_sentier = True
                 self.dictionnaire.clear()
@@ -463,7 +463,7 @@ class Partie():
     def creer_niveau(self, evt):
         if len(self.niveau.liste_creep_a_l_ecran) == 0:
             self.niveau_actuel += 1
-            if (self.niveau_actuel > 1):
+            if (self.niveau_actuel > 4):
                 self.parent.sentier_choisi = 1
                 self.changement_niveau()
             self.niveau.fin_niveau = False
@@ -863,7 +863,7 @@ class Tour():
                 Projectil_c(self.position_x_tour, self.position_y_tour, creep_cible,self))
 
     def afficher_rayon(self):
-        self.rayon_visible = True
+        self.rayon_visible = not self.rayon_visible
 
     def up_degats(self):
         if self.parent.total_sagesse >= 300:
@@ -1156,19 +1156,26 @@ class Controleur():
         return self.modele.partie.creer_tour(evt, couleur_tour)
 
     def creer_niveau(self, evt):
-        self.modele.partie.creer_niveau(evt)
+        if self.partie_en_cours != 0:
+            self.modele.partie.creer_niveau(evt)
 
     def upgrade_range(self, evt):
-        monchoix = self.vue.tour_choix
-        monchoix.up_range()
+        if self.partie_en_cours != 0:
+            if self.vue.tour_choix is not None:
+                monchoix = self.vue.tour_choix
+                monchoix.up_range()
 
     def upgrade_degats(self, evt):
-        monchoix = self.vue.tour_choix
-        monchoix.up_degats()
+        if self.partie_en_cours != 0:
+            if self.vue.tour_choix is not None:
+                monchoix = self.vue.tour_choix
+                monchoix.up_degats()
 
     def upgrade_special(self, evt):
-        monchoix = self.vue.tour_choix
-        monchoix.up_special()
+        if self.partie_en_cours != 0:
+            if self.vue.tour_choix is not None:
+                monchoix = self.vue.tour_choix
+                monchoix.up_special()
 
 if __name__ == '__main__':
     c = Controleur()
