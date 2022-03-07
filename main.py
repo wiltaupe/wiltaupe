@@ -352,10 +352,10 @@ class Vue():
 
         if reponse1 is not None:
             if(self.modele.partie.total_points<self.modele.partie.meilleur_score):
-                nice_try = reponse1 + ", votre performance laisse à désirer " + str(self.modele.partie.total_points) + " points ont étés octroyés. Vous êtes une honte pour l'humanité."
+                nice_try = reponse1 + ", votre performance laisse à désirer " + str(self.modele.partie.total_points) + " points ont étés octroyés. Votre système est inopérable..."
 
             else:
-                nice_try = reponse1 + ", congratulations, votre performance est tout un exploit. " + str(self.modele.partie.total_points) + " points ont étés octroyés. Dommage que vous soyez le dernier humain vivant... "
+                nice_try = reponse1 + ", congratulations, votre performance est tout un exploit. " + str(self.modele.partie.total_points) + " points ont étés octroyés. J'espère que vous ayez des amis à qui en parler... "
 
             if self.modele.partie.meilleur_score < self.modele.partie.total_points:
 
