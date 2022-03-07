@@ -23,7 +23,7 @@ En appuyant sur le bouton *DÉBUTER PARTIE* la première vague d'ennemis commenc
 
 Pour acheter une tour, pesez le bouton de la tour que vous voulez construire et cliquez ensuite autour du bus (sentier) pour la placer. 
 
-Les vagues deviendront de plus en plus difficiles, puisqu'elles seront de plus en plus populeuses, et que les ennemis plus faibles (Verts) deviendront moins nombreux, alors que les plus forts (Jaunes et Rouges) augmenteront en nombre. 
+Les vagues deviendront de plus en plus difficiles, puisqu'elles seront de plus en plus populeuses, et que les ennemis plus faibles (Oranges) deviendront moins nombreux, alors que les plus forts (Jaunes et Rouges) augmenteront en nombre. 
 Plus le temps avance, plus les virus deviennent résistants.
 
 Le dernier ennemi de chaque vague est un Trojan, qui est beaucoup plus puissant que les virus réguliers.
@@ -32,7 +32,7 @@ Chaque ennemi détruit octroie des points, qui vous offrent la possibilité de g
 
 En détruisant des ennemis, vous gagnez de l'argent qui vous permettera d'acheter de nouvelles tours anti-virus. 
 
-Chaque vague détruite vous donnera des points de sagesse, qui permettent de débloquer de nouvelles tours. 
+Chaque vague détruite vous donnera des points de sagesse, qui permettent d'améliorer vos tours. 
 
 Le bouton SCAN fait un scan du système et endommage tous les virus qui y sont actuellement. Chaque scan coûte 1000৳. Un nouveau scan est octroyé à la fin de chaque niveau. 
 
@@ -55,6 +55,7 @@ Si un niveau est complété sans qu'aucun ennemi se rende au CPU, un bonus est o
 
 # ♦ BUGS CONNUS ♦
   
-  
+  1. Classe projectils_rebond: quand le projectile  est rendu au dernier creep à l'écran, et qU'il n'a pas terminé sa trajectoire, il attend, immobile, jusqu'au prochain creep         qui rentrera à l'écran.
+  2. Classe projectils_shotgun: des projectiles, une fois rendus sur le bord de l'écran, s'y amoncèlent au lieu de disparaître.
  
 
